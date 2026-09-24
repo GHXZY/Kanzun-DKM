@@ -8,6 +8,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -153,7 +154,7 @@ fun FundraisingScreen(
                                 Text(
                                     text = "Daftar Target Dana",
                                     style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.Bold,
+                                    fontWeight = FontWeight.SemiBold,
                                 )
                                 Text(
                                     text = "${uiState.allTargets.size} Target",
@@ -307,7 +308,7 @@ private fun SummaryAndPieChartCard(uiState: FundraisingUiState) {
                 Text(
                     text = "Ringkasan Target Dana",
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.SemiBold,
                 )
                 StatusChip(
                     text = "${(uiState.overallProgress * 100).toInt()}% Terkumpul",
@@ -397,13 +398,14 @@ private fun SummaryMetricRow(
         Text(
             text = label,
             style = if (isHighlight) MaterialTheme.typography.bodyMedium else MaterialTheme.typography.bodySmall,
-            fontWeight = if (isHighlight) FontWeight.Bold else FontWeight.Normal,
+            fontWeight = FontWeight.Normal,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Text(
             text = value,
             style = if (isHighlight) MaterialTheme.typography.titleSmall else MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Bold,
+            letterSpacing = (-0.3).sp,
             color = color,
         )
     }
@@ -501,8 +503,8 @@ private fun LegendItem(
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(
                 modifier = Modifier
-                    .size(10.dp)
-                    .clip(CircleShape)
+                    .size(8.dp)
+                    .clip(RoundedCornerShape(2.dp))
                     .background(color),
             )
             Spacer(modifier = Modifier.width(8.dp))
@@ -517,6 +519,7 @@ private fun LegendItem(
                 text = amountText,
                 style = MaterialTheme.typography.bodySmall,
                 fontWeight = FontWeight.Bold,
+                letterSpacing = (-0.2).sp,
             )
             Spacer(modifier = Modifier.width(6.dp))
             Text(
@@ -574,7 +577,7 @@ private fun TargetCardItem(
                 Text(
                     text = target.title,
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.SemiBold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f),
@@ -594,13 +597,16 @@ private fun TargetCardItem(
             ) {
                 Text(
                     text = Money.of(collectedCents).formatRupiah(),
-                    style = MaterialTheme.typography.titleSmall,
+                    style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
+                    letterSpacing = (-0.3).sp,
                     color = PrimaryBlue,
                 )
                 Text(
                     text = "/ ${Money.of(target.targetAmountInCents).formatRupiah()}",
                     style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Normal,
+                    letterSpacing = (-0.2).sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
@@ -619,21 +625,22 @@ private fun TargetCardItem(
                 Text(
                     text = "${(collectedProgress * 100).toInt()}% Terkumpul",
                     style = MaterialTheme.typography.labelSmall,
-                    fontWeight = FontWeight.SemiBold,
+                    fontWeight = FontWeight.Bold,
                     color = PrimaryBlue,
                 )
                 Text(
                     text = "${(distributedProgress * 100).toInt()}% Tersalurkan",
                     style = MaterialTheme.typography.labelSmall,
-                    fontWeight = FontWeight.SemiBold,
+                    fontWeight = FontWeight.Bold,
                     color = AccentAmber,
                 )
             }
 
             // THREE METRIC FOOTER
             Surface(
-                shape = RoundedCornerShape(8.dp),
-                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                shape = RoundedCornerShape(4.dp),
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)),
+                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Row(
@@ -663,8 +670,8 @@ private fun DualProgressBar(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(10.dp)
-            .clip(RoundedCornerShape(5.dp))
+            .height(6.dp)
+            .clip(RoundedCornerShape(3.dp))
             .background(trackBg),
     ) {
         // Track 1: Terkumpul / Masuk (Primary Blue)
@@ -672,7 +679,7 @@ private fun DualProgressBar(
             modifier = Modifier
                 .fillMaxHeight()
                 .fillMaxWidth(collectedProgress)
-                .clip(RoundedCornerShape(5.dp))
+                .clip(RoundedCornerShape(3.dp))
                 .background(PrimaryBlue),
         )
         // Track 2: Tersalurkan (Accent Amber overlay)
@@ -680,7 +687,7 @@ private fun DualProgressBar(
             modifier = Modifier
                 .fillMaxHeight()
                 .fillMaxWidth(distributedProgress.coerceAtMost(collectedProgress))
-                .clip(RoundedCornerShape(5.dp))
+                .clip(RoundedCornerShape(3.dp))
                 .background(AccentAmber),
         )
     }
@@ -698,6 +705,7 @@ private fun MetricMiniCell(label: String, value: String) {
             text = value,
             style = MaterialTheme.typography.bodySmall,
             fontWeight = FontWeight.Bold,
+            letterSpacing = (-0.2).sp,
         )
     }
 }
@@ -812,27 +820,28 @@ private fun SpeedDialItem(
         modifier = Modifier.clickable(onClick = onClick),
     ) {
         Surface(
-            shape = RoundedCornerShape(8.dp),
+            shape = RoundedCornerShape(4.dp),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
             color = MaterialTheme.colorScheme.surface,
             tonalElevation = 0.dp,
-            shadowElevation = 4.dp,
+            shadowElevation = 1.dp,
         ) {
             Text(
                 text = label,
                 style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.SemiBold,
+                fontWeight = FontWeight.Normal,
                 color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
             )
         }
         Spacer(modifier = Modifier.width(10.dp))
         Surface(
-            shape = CircleShape,
+            shape = RoundedCornerShape(4.dp),
             color = PrimaryBlue,
             contentColor = Color.White,
             tonalElevation = 0.dp,
-            shadowElevation = 4.dp,
-            modifier = Modifier.size(44.dp),
+            shadowElevation = 1.dp,
+            modifier = Modifier.size(40.dp),
         ) {
             Box(contentAlignment = Alignment.Center) {
                 Icon(imageVector = icon, contentDescription = label, modifier = Modifier.size(20.dp))
@@ -951,38 +960,39 @@ private fun RecordFundDialog(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+                    .padding(2.dp),
             ) {
                 Box(
                     modifier = Modifier
                         .weight(1f)
-                        .clip(RoundedCornerShape(12.dp))
+                        .clip(RoundedCornerShape(4.dp))
                         .background(if (!isKasAllocation) PrimaryBlue else Color.Transparent)
                         .clickable { isKasAllocation = false }
-                        .padding(vertical = 12.dp),
+                        .padding(vertical = 10.dp),
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
                         text = "Donasi",
                         style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = if (!isKasAllocation) FontWeight.Normal else FontWeight.Light,
                         color = if (!isKasAllocation) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
                 Box(
                     modifier = Modifier
                         .weight(1f)
-                        .clip(RoundedCornerShape(12.dp))
+                        .clip(RoundedCornerShape(4.dp))
                         .background(if (isKasAllocation) PrimaryBlue else Color.Transparent)
                         .clickable { isKasAllocation = true }
-                        .padding(vertical = 12.dp),
+                        .padding(vertical = 10.dp),
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
                         text = "Alokasi Kas Masjid",
                         style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = if (isKasAllocation) FontWeight.Normal else FontWeight.Light,
                         color = if (isKasAllocation) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
@@ -1365,7 +1375,8 @@ private fun CancelTargetDialog(
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
             Surface(
-                shape = RoundedCornerShape(8.dp),
+                shape = RoundedCornerShape(4.dp),
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.error.copy(alpha = 0.3f)),
                 color = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.4f),
                 modifier = Modifier.fillMaxWidth(),
             ) {
@@ -1479,7 +1490,8 @@ private fun TargetDetailDialog(
             val availableCents = metrics?.availableRemainingInCents ?: (collectedCents - distributedCents).coerceAtLeast(0L)
 
             Surface(
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(6.dp),
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
                 color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
                 modifier = Modifier.fillMaxWidth(),
             ) {
@@ -1503,23 +1515,35 @@ private fun TargetDetailDialog(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Surface(
-                    shape = RoundedCornerShape(8.dp),
+                    shape = RoundedCornerShape(4.dp),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)),
                     color = PrimaryBlue.copy(alpha = 0.1f),
                     modifier = Modifier.weight(1f),
                 ) {
                     Column(modifier = Modifier.padding(10.dp)) {
                         Text("Donasi", style = MaterialTheme.typography.labelSmall, color = PrimaryBlue)
-                        Text(Money.of(donasiCents).formatRupiah(), style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold)
+                        Text(
+                            Money.of(donasiCents).formatRupiah(),
+                            style = MaterialTheme.typography.bodySmall,
+                            fontWeight = FontWeight.Bold,
+                            letterSpacing = (-0.2).sp,
+                        )
                     }
                 }
                 Surface(
-                    shape = RoundedCornerShape(8.dp),
+                    shape = RoundedCornerShape(4.dp),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)),
                     color = AccentAmber.copy(alpha = 0.15f),
                     modifier = Modifier.weight(1f),
                 ) {
                     Column(modifier = Modifier.padding(10.dp)) {
                         Text("Alokasi Kas", style = MaterialTheme.typography.labelSmall, color = AccentAmber)
-                        Text(Money.of(kasCents).formatRupiah(), style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold)
+                        Text(
+                            Money.of(kasCents).formatRupiah(),
+                            style = MaterialTheme.typography.bodySmall,
+                            fontWeight = FontWeight.Bold,
+                            letterSpacing = (-0.2).sp,
+                        )
                     }
                 }
             }
@@ -1640,35 +1664,41 @@ private fun HistoryRow(
     amountText: String,
     isIncoming: Boolean,
 ) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(8.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f))
-            .padding(horizontal = 12.dp, vertical = 8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
+    Surface(
+        shape = RoundedCornerShape(4.dp),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
+        modifier = Modifier.fillMaxWidth(),
     ) {
-        Column(modifier = Modifier.weight(1f)) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp, vertical = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.bodySmall,
+                    fontWeight = FontWeight.Normal,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Text(
+                    text = dateText,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
             Text(
-                text = title,
+                text = amountText,
                 style = MaterialTheme.typography.bodySmall,
-                fontWeight = FontWeight.SemiBold,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-            Text(
-                text = dateText,
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = (-0.2).sp,
+                color = if (isIncoming) PrimaryBlue else AccentAmber,
             )
         }
-        Text(
-            text = amountText,
-            style = MaterialTheme.typography.bodySmall,
-            fontWeight = FontWeight.Bold,
-            color = if (isIncoming) PrimaryBlue else AccentAmber,
-        )
     }
 }
 
@@ -1697,7 +1727,7 @@ private fun StyledModalDialog(
                 Text(
                     text = title,
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.weight(1f),
                 )

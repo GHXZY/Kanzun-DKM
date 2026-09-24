@@ -24,33 +24,35 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 import com.kanzun.perbendaharaan.core.designsystem.Elevation
 import com.kanzun.perbendaharaan.core.designsystem.IconSize
 import com.kanzun.perbendaharaan.core.designsystem.KanzunShapes
 import com.kanzun.perbendaharaan.core.designsystem.Spacing
+import com.kanzun.perbendaharaan.core.designsystem.TypographyTokens
 
 @Composable
 fun AppCard(
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
     containerColor: Color = MaterialTheme.colorScheme.surface,
-    borderColor: Color = MaterialTheme.colorScheme.outline,
+    borderColor: Color = MaterialTheme.colorScheme.outlineVariant,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     if (onClick != null) {
         Card(
             onClick = onClick,
-            modifier = modifier.neomorphic(KanzunShapes.Card),
+            modifier = modifier,
             shape = KanzunShapes.Card,
             colors = CardDefaults.cardColors(containerColor = containerColor),
-            border = BorderStroke(0.5.dp, borderColor.copy(alpha = 0.18f)),
-            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+            border = BorderStroke(1.dp, borderColor),
+            elevation = CardDefaults.cardElevation(defaultElevation = 1.dp, pressedElevation = 2.dp),
         ) {
             Column(
                 modifier = Modifier.padding(Spacing.MD),
@@ -59,11 +61,11 @@ fun AppCard(
         }
     } else {
         Card(
-            modifier = modifier.neomorphic(KanzunShapes.Card),
+            modifier = modifier,
             shape = KanzunShapes.Card,
             colors = CardDefaults.cardColors(containerColor = containerColor),
-            border = BorderStroke(0.5.dp, borderColor.copy(alpha = 0.18f)),
-            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+            border = BorderStroke(1.dp, borderColor),
+            elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
         ) {
             Column(
                 modifier = Modifier.padding(Spacing.MD),
@@ -83,48 +85,63 @@ fun HeroCard(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .heightIn(min = 160.dp)
-            .neomorphic(KanzunShapes.HeroCard),
+            .heightIn(min = 132.dp),
         shape = KanzunShapes.HeroCard,
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primary,
+            containerColor = Color(0xFF0D47A1), // Brand Secondary Navy Anchor
             contentColor = Color.White,
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.16f)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .heightIn(min = 160.dp)
-                .padding(horizontal = Spacing.LG, vertical = Spacing.LG),
+                .padding(horizontal = Spacing.LG, vertical = Spacing.MD + 4.dp),
             contentAlignment = Alignment.CenterStart,
         ) {
             Column(
                 horizontalAlignment = Alignment.Start,
                 verticalArrangement = Arrangement.Center,
             ) {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.titleSmall,
-                    color = Color.White.copy(alpha = 0.80f),
-                    fontWeight = FontWeight.Medium,
-                )
+                // Micro-badge pill (Stripe style)
+                Surface(
+                    shape = KanzunShapes.SmallComponent,
+                    color = Color.White.copy(alpha = 0.12f),
+                    border = BorderStroke(0.5.dp, Color.White.copy(alpha = 0.22f)),
+                ) {
+                    Text(
+                        text = title.uppercase(),
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            fontSize = 10.sp,
+                            fontWeight = TypographyTokens.SemiBold,
+                            letterSpacing = 0.8.sp,
+                        ),
+                        color = Color.White.copy(alpha = 0.90f),
+                        modifier = Modifier.padding(horizontal = Spacing.SM, vertical = 2.dp),
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(Spacing.SM))
 
+                // Editorial balance display with Level 1 Bold 700 and negative tracking
                 Text(
                     text = amountText,
-                    style = MaterialTheme.typography.displaySmall,
+                    style = MaterialTheme.typography.displayMedium.copy(
+                        fontWeight = TypographyTokens.Bold,
+                        letterSpacing = (-0.64).sp,
+                    ),
                     color = Color.White,
-                    fontWeight = FontWeight.Bold,
                 )
 
                 if (subtitle != null) {
                     Spacer(modifier = Modifier.height(Spacing.XS))
                     Text(
                         text = subtitle,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Color.White.copy(alpha = 0.70f),
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            fontWeight = TypographyTokens.Regular,
+                        ),
+                        color = Color.White.copy(alpha = 0.75f),
                     )
                 }
             }
@@ -144,7 +161,7 @@ fun KpiCard(
     onClick: (() -> Unit)? = null,
 ) {
     AppCard(
-        modifier = modifier.neomorphic(KanzunShapes.Card),
+        modifier = modifier,
         onClick = onClick,
     ) {
         Row(
@@ -155,21 +172,27 @@ fun KpiCard(
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = title,
-                    style = MaterialTheme.typography.labelMedium,
+                    style = MaterialTheme.typography.titleSmall.copy(
+                        fontWeight = TypographyTokens.SemiBold,
+                    ),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Spacer(modifier = Modifier.height(Spacing.XS))
                 Text(
                     text = valueText,
-                    style = MaterialTheme.typography.headlineMedium,
+                    style = MaterialTheme.typography.headlineMedium.copy(
+                        fontWeight = TypographyTokens.Bold,
+                        letterSpacing = (-0.3).sp,
+                    ),
                     color = MaterialTheme.colorScheme.onSurface,
-                    fontWeight = FontWeight.Bold,
                 )
                 if (subtitle != null) {
                     Spacer(modifier = Modifier.height(Spacing.XS))
                     Text(
                         text = subtitle,
-                        style = MaterialTheme.typography.bodySmall,
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            fontWeight = TypographyTokens.Regular,
+                        ),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
@@ -181,13 +204,14 @@ fun KpiCard(
                     shape = KanzunShapes.SmallComponent,
                     color = iconContainerColor,
                     contentColor = iconColor,
-                    modifier = Modifier.size(40.dp),
+                    border = BorderStroke(0.5.dp, iconColor.copy(alpha = 0.25f)),
+                    modifier = Modifier.size(36.dp),
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Icon(
                             imageVector = icon,
                             contentDescription = null,
-                            modifier = Modifier.size(IconSize.Standard),
+                            modifier = Modifier.size(IconSize.SmallAction),
                         )
                     }
                 }
@@ -195,6 +219,7 @@ fun KpiCard(
         }
     }
 }
+
 
 @Composable
 fun ProgressCard(
@@ -218,7 +243,9 @@ fun ProgressCard(
             Text(
                 text = title,
                 modifier = Modifier.weight(1f),
-                style = MaterialTheme.typography.titleLarge,
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = TypographyTokens.SemiBold,
+                ),
                 color = MaterialTheme.colorScheme.onSurface,
             )
             if (badgeText != null) {
@@ -234,26 +261,32 @@ fun ProgressCard(
         ) {
             Text(
                 text = currentAmountText,
-                style = MaterialTheme.typography.headlineSmall,
+                style = MaterialTheme.typography.headlineSmall.copy(
+                    fontWeight = TypographyTokens.Bold,
+                    letterSpacing = (-0.2).sp,
+                ),
                 color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.Bold,
             )
             Text(
                 text = "Target $targetAmountText",
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.bodySmall.copy(
+                    fontWeight = TypographyTokens.Regular,
+                ),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
 
         Spacer(modifier = Modifier.height(Spacing.SM))
 
-        AppProgressBar(progress = progress)
+        AppProgressBar(progress = progress, height = 6.dp)
 
         Spacer(modifier = Modifier.height(Spacing.XS))
 
         Text(
             text = "${(progress * 100).toInt()}% tercapai",
-            style = MaterialTheme.typography.labelSmall,
+            style = MaterialTheme.typography.labelSmall.copy(
+                fontWeight = TypographyTokens.Bold,
+            ),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.align(Alignment.End),
         )

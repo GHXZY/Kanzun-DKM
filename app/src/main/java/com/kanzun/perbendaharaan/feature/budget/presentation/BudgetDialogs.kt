@@ -1,6 +1,7 @@
 package com.kanzun.perbendaharaan.feature.budget.presentation
 
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -108,13 +109,13 @@ fun CreateEditBudgetDialog(
         properties = DialogProperties(usePlatformDefaultWidth = false),
     ) {
         Surface(
-            shape = RoundedCornerShape(20.dp),
+            shape = RoundedCornerShape(8.dp),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
             color = MaterialTheme.colorScheme.surface,
             tonalElevation = 0.dp,
             shadowElevation = 0.dp,
             modifier = Modifier
-                .fillMaxWidth()
-                ,
+                .fillMaxWidth(),
         ) {
             Column(
                 modifier = Modifier
@@ -131,7 +132,7 @@ fun CreateEditBudgetDialog(
                     Text(
                         text = if (existingBudget != null) "Edit RAPBM" else "Buat RAPBM",
                         style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.SemiBold,
                         modifier = Modifier.weight(1f),
                     )
                     IconButton(onClick = onDismiss, modifier = Modifier.size(48.dp)) {
@@ -216,7 +217,8 @@ fun CreateEditBudgetDialog(
 
                     // PERIODE TANGGAL AUTO INFO
                     Surface(
-                        shape = RoundedCornerShape(8.dp),
+                        shape = RoundedCornerShape(4.dp),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)),
                         color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
                         modifier = Modifier.fillMaxWidth(),
                     ) {
@@ -229,7 +231,7 @@ fun CreateEditBudgetDialog(
                     }
 
                     // KATEGORI PEMASUKAN
-                    Text(text = "Kategori Pemasukan & Rancangan (Rp)", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
+                    Text(text = "Kategori Pemasukan & Rancangan (Rp)", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
 
                     val incomeCats = categories.filter { it.type == TransactionType.INCOME }.ifEmpty {
                         listOf(
@@ -276,7 +278,7 @@ fun CreateEditBudgetDialog(
                     }
 
                     // KATEGORI PENGELUARAN
-                    Text(text = "Kategori Pengeluaran & Rancangan (Rp)", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
+                    Text(text = "Kategori Pengeluaran & Rancangan (Rp)", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
 
                     val expenseCats = categories.filter { it.type == TransactionType.EXPENSE }.ifEmpty {
                         listOf(
@@ -360,7 +362,8 @@ fun DeleteBudgetDialog(
 ) {
     Dialog(onDismissRequest = onDismiss) {
         Surface(
-            shape = RoundedCornerShape(20.dp),
+            shape = RoundedCornerShape(8.dp),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
             color = MaterialTheme.colorScheme.surface,
             tonalElevation = 0.dp,
             shadowElevation = 0.dp,
@@ -375,14 +378,15 @@ fun DeleteBudgetDialog(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Text(text = "Hapus RAPBM", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text(text = "Hapus RAPBM", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
                     IconButton(onClick = onDismiss, modifier = Modifier.size(48.dp)) {
                         Icon(imageVector = Icons.Default.Close, contentDescription = "Tutup", modifier = Modifier.size(24.dp))
                     }
                 }
 
                 Surface(
-                    shape = RoundedCornerShape(8.dp),
+                    shape = RoundedCornerShape(4.dp),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.error.copy(alpha = 0.3f)),
                     color = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.4f),
                     modifier = Modifier.fillMaxWidth(),
                 ) {

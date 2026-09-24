@@ -1,5 +1,6 @@
 package com.kanzun.perbendaharaan.core.designsystem.components
 
+import androidx.compose.foundation.BorderStroke
 import com.kanzun.perbendaharaan.core.designsystem.neomorphic
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.foundation.layout.Arrangement
@@ -37,21 +38,24 @@ fun PrimaryButton(
     enabled: Boolean = true,
     icon: ImageVector? = null,
     fullWidth: Boolean = false,
+    containerColor: Color = MaterialTheme.colorScheme.primary,
+    contentColor: Color = MaterialTheme.colorScheme.onPrimary,
 ) {
     val buttonModifier = if (fullWidth) modifier.fillMaxWidth() else modifier
 
     Button(
         onClick = onClick,
-        modifier = buttonModifier.defaultMinSize(minHeight = 48.dp).neomorphic(KanzunShapes.Button, inset = !enabled),
+        modifier = buttonModifier.defaultMinSize(minHeight = 44.dp),
         enabled = enabled,
         shape = KanzunShapes.Button,
         colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.primary,
-            contentColor = MaterialTheme.colorScheme.onPrimary,
+            containerColor = containerColor,
+            contentColor = contentColor,
             disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
             disabledContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
         ),
-        contentPadding = PaddingValues(horizontal = Spacing.MD, vertical = Spacing.MDS),
+        elevation = ButtonDefaults.buttonElevation(defaultElevation = 1.dp, pressedElevation = 2.dp),
+        contentPadding = PaddingValues(horizontal = Spacing.MD, vertical = Spacing.SM + 2.dp),
     ) {
         Row(
             horizontalArrangement = Arrangement.Center,
@@ -87,7 +91,7 @@ fun SecondaryButton(
 
     Button(
         onClick = onClick,
-        modifier = buttonModifier.defaultMinSize(minHeight = 48.dp).neomorphic(KanzunShapes.Button, inset = !enabled),
+        modifier = buttonModifier.defaultMinSize(minHeight = 44.dp),
         enabled = enabled,
         shape = KanzunShapes.Button,
         colors = ButtonDefaults.buttonColors(
@@ -96,7 +100,9 @@ fun SecondaryButton(
             disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
             disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
         ),
-        contentPadding = PaddingValues(horizontal = Spacing.MD, vertical = Spacing.MDS),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.secondary.copy(alpha = 0.25f)),
+        elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp),
+        contentPadding = PaddingValues(horizontal = Spacing.MD, vertical = Spacing.SM + 2.dp),
     ) {
         Row(
             horizontalArrangement = Arrangement.Center,
@@ -132,13 +138,14 @@ fun AppOutlinedButton(
 
     OutlinedButton(
         onClick = onClick,
-        modifier = buttonModifier.defaultMinSize(minHeight = 48.dp).neomorphic(KanzunShapes.Button, inset = !enabled),
+        modifier = buttonModifier.defaultMinSize(minHeight = 44.dp),
         enabled = enabled,
         shape = KanzunShapes.Button,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
         colors = ButtonDefaults.outlinedButtonColors(
             contentColor = MaterialTheme.colorScheme.primary,
         ),
-        contentPadding = PaddingValues(horizontal = Spacing.MD, vertical = Spacing.MDS),
+        contentPadding = PaddingValues(horizontal = Spacing.MD, vertical = Spacing.SM + 2.dp),
     ) {
         Row(
             horizontalArrangement = Arrangement.Center,
@@ -161,6 +168,7 @@ fun AppOutlinedButton(
     }
 }
 
+
 @Composable
 fun AppIconButton(
     icon: ImageVector,
@@ -168,16 +176,18 @@ fun AppIconButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    containerColor: Color = MaterialTheme.colorScheme.surfaceVariant,
+    containerColor: Color = MaterialTheme.colorScheme.surface,
     contentColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
 ) {
     Surface(
         onClick = onClick,
-        modifier = modifier.size(48.dp).neomorphic(KanzunShapes.SmallComponent, inset = !enabled),
+        modifier = modifier.size(38.dp),
         enabled = enabled,
         shape = KanzunShapes.SmallComponent,
         color = containerColor,
         contentColor = contentColor,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+        shadowElevation = 1.dp,
     ) {
         Row(
             horizontalArrangement = Arrangement.Center,
@@ -186,7 +196,7 @@ fun AppIconButton(
             Icon(
                 imageVector = icon,
                 contentDescription = contentDescription,
-                modifier = Modifier.size(IconSize.Standard),
+                modifier = Modifier.size(IconSize.SmallAction),
             )
         }
     }

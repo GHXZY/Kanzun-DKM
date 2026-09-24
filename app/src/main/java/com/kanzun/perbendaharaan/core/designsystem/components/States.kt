@@ -34,9 +34,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.kanzun.perbendaharaan.core.designsystem.IconSize
 import com.kanzun.perbendaharaan.core.designsystem.KanzunShapes
 import com.kanzun.perbendaharaan.core.designsystem.Spacing
+import com.kanzun.perbendaharaan.core.designsystem.TypographyTokens
 
 @Composable
 fun EmptyState(
@@ -58,16 +60,17 @@ fun EmptyState(
             verticalArrangement = Arrangement.Center,
         ) {
             Surface(
-                shape = KanzunShapes.Pill,
-                color = MaterialTheme.colorScheme.secondaryContainer,
-                modifier = Modifier.size(64.dp),
+                shape = KanzunShapes.SmallComponent,
+                color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f),
+                border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+                modifier = Modifier.size(52.dp),
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
                         imageVector = icon,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(IconSize.LargeFeature),
+                        modifier = Modifier.size(24.dp),
                     )
                 }
             }
@@ -76,9 +79,11 @@ fun EmptyState(
 
             Text(
                 text = title,
-                style = MaterialTheme.typography.headlineSmall,
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = TypographyTokens.SemiBold,
+                    letterSpacing = (-0.2).sp,
+                ),
                 color = MaterialTheme.colorScheme.onSurface,
-                fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
             )
 
@@ -86,7 +91,9 @@ fun EmptyState(
 
             Text(
                 text = description,
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodySmall.copy(
+                    fontWeight = TypographyTokens.Regular,
+                ),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(horizontal = Spacing.MD),
@@ -112,8 +119,8 @@ fun ErrorState(
 ) {
     AppCard(
         modifier = modifier.fillMaxWidth(),
-        containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.3f),
-        borderColor = MaterialTheme.colorScheme.error.copy(alpha = 0.4f),
+        containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.15f),
+        borderColor = MaterialTheme.colorScheme.error.copy(alpha = 0.25f),
     ) {
         Column(
             modifier = Modifier
@@ -125,16 +132,17 @@ fun ErrorState(
                 imageVector = Icons.Default.ErrorOutline,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.error,
-                modifier = Modifier.size(IconSize.LargeFeature),
+                modifier = Modifier.size(32.dp),
             )
 
             Spacer(modifier = Modifier.height(Spacing.MDS))
 
             Text(
                 text = title,
-                style = MaterialTheme.typography.headlineSmall,
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = TypographyTokens.SemiBold,
+                ),
                 color = MaterialTheme.colorScheme.onErrorContainer,
-                fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
             )
 
@@ -142,7 +150,9 @@ fun ErrorState(
 
             Text(
                 text = message,
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodySmall.copy(
+                    fontWeight = TypographyTokens.Regular,
+                ),
                 color = MaterialTheme.colorScheme.onErrorContainer,
                 textAlign = TextAlign.Center,
             )

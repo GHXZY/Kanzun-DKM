@@ -332,6 +332,28 @@ class FinancialRepositoryImpl @Inject constructor(
         return accountDao.getActiveAccounts()
     }
 
+    override suspend fun updateOpeningBalance(accountId: String, openingBalanceInCents: Long) {
+        val account = accountDao.getAccountById(accountId) ?: return
+        val activeTxs = transactionDao.getActiveTransactionsForAccount(accountId)
+        val incomeCents = activeTxs.filter { it.type == TransactionType.INCOME }.sumOf { it.amountInCents }
+        val expenseCents = activeTxs.filter { it.type == TransactionType.EXPENSE }.sumOf { it.amountInCents }
+        val newCurrentBalance = openingBalanceInCents + incomeCents - expenseCents
+        accountDao.updateAccount(
+            account.copy(
+                openingBalanceInCents = openingBalanceInCents,
+                currentBalanceInCents = newCurrentBalance,
+            )
+        )
+        createAuditLog(
+            whoUserId = "system",
+            action = "UPDATE_OPENING_BALANCE",
+            entityName = "Account",
+            entityId = accountId,
+            beforeStateJson = "{\"openingBalance\": ${account.openingBalanceInCents}}",
+            afterStateJson = "{\"openingBalance\": $openingBalanceInCents, \"currentBalance\": $newCurrentBalance}",
+        )
+    }
+
     override suspend fun addFund(fund: FundEntity) {
         fundDao.insertFund(fund)
     }

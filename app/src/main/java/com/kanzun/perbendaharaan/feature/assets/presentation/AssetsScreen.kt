@@ -280,9 +280,10 @@ private fun AssetCardItem(
                 modifier = Modifier.weight(1f),
             ) {
                 Surface(
-                    shape = KanzunShapes.Pill,
+                    shape = KanzunShapes.SmallComponent,
                     color = MaterialTheme.colorScheme.primaryContainer,
-                    modifier = Modifier.size(42.dp),
+                    border = androidx.compose.foundation.BorderStroke(0.5.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.25f)),
+                    modifier = Modifier.size(36.dp),
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Icon(
@@ -293,7 +294,7 @@ private fun AssetCardItem(
                             },
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                            modifier = Modifier.size(22.dp),
+                            modifier = Modifier.size(18.dp),
                         )
                     }
                 }
@@ -307,9 +308,8 @@ private fun AssetCardItem(
                     ) {
                         Text(
                             text = asset.name,
-                            style = MaterialTheme.typography.titleMedium.copy(
-                                fontSize = 15.sp,
-                                fontWeight = FontWeight.Bold,
+                            style = MaterialTheme.typography.titleSmall.copy(
+                                fontWeight = FontWeight.Normal,
                             ),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -322,7 +322,9 @@ private fun AssetCardItem(
                     val cleanCat = categoryDisplay.formatCategoryName()
                     Text(
                         text = "$cleanCat \u2022 $formattedDate",
-                        style = MaterialTheme.typography.bodySmall,
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            fontWeight = FontWeight.Normal,
+                        ),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
@@ -335,8 +337,8 @@ private fun AssetCardItem(
             Text(
                 text = Money.of(asset.acquisitionValueInCents).formatRupiah(),
                 style = MaterialTheme.typography.titleMedium.copy(
-                    fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
+                    letterSpacing = (-0.2).sp,
                 ),
                 color = MaterialTheme.colorScheme.primary,
                 maxLines = 1,
@@ -403,7 +405,7 @@ private fun AssetFormDialog(
                         text = if (isEditMode) "Edit Aset" else "Tambah Aset",
                         style = MaterialTheme.typography.titleLarge.copy(
                             fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
+                            fontWeight = FontWeight.SemiBold,
                         ),
                         color = MaterialTheme.colorScheme.onSurface,
                     )
@@ -695,7 +697,7 @@ private fun AssetDetailDialog(
                         text = asset.name,
                         style = MaterialTheme.typography.titleLarge.copy(
                             fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
+                            fontWeight = FontWeight.SemiBold,
                         ),
                         modifier = Modifier.weight(1f),
                     )
@@ -718,7 +720,7 @@ private fun AssetDetailDialog(
                     verticalArrangement = Arrangement.spacedBy(Spacing.SM),
                 ) {
                     DetailRow("Kategori", cleanCategory)
-                    DetailRow("Nilai Perolehan", Money.of(asset.acquisitionValueInCents).formatRupiah())
+                    DetailRow("Nilai Perolehan", Money.of(asset.acquisitionValueInCents).formatRupiah(), isEmphasized = true)
                     DetailRow("Kondisi", if (asset.conditionStatus == "Draft") "Baik" else asset.conditionStatus)
                     DetailRow("Lokasi Penempatan", asset.location)
                     DetailRow("Sumber Dana", asset.fundSourceId)
@@ -753,12 +755,17 @@ private fun AssetDetailDialog(
 }
 
 @Composable
-private fun DetailRow(label: String, value: String) {
+private fun DetailRow(label: String, value: String, isEmphasized: Boolean = false) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(Spacing.XS),
     ) {
         Text(text = label, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Text(text = value, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = if (isEmphasized) FontWeight.Bold else FontWeight.Normal,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
     }
 }

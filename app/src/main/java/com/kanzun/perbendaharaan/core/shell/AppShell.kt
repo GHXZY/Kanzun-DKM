@@ -36,7 +36,9 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.kanzun.perbendaharaan.core.designsystem.components.SupportDonationDialog
 import com.kanzun.perbendaharaan.feature.notifications.presentation.NotificationViewModel
+import com.kanzun.perbendaharaan.feature.onboarding.presentation.InitialOpeningBalanceScreen
 import com.kanzun.perbendaharaan.feature.settings.presentation.SettingsViewModel
+import com.kanzun.perbendaharaan.feature.splash.presentation.OpeningScreen
 import kotlinx.coroutines.launch
 
 @Composable
@@ -49,8 +51,16 @@ fun AppShell(
 
     var isDarkTheme by remember { mutableStateOf(false) }
     var showSupportDialog by remember { mutableStateOf(false) }
+    var isShowingOpeningScreen by remember { mutableStateOf(true) }
+    var hasCompletedInitialSetup by remember {
+        mutableStateOf(
+            context.getSharedPreferences("kanzun_app_prefs", Context.MODE_PRIVATE)
+                .getBoolean("has_completed_initial_setup", false)
+        )
+    }
 
     fun checkAndTriggerSupportDialog() {
+        if (isShowingOpeningScreen || !hasCompletedInitialSetup) return
         val prefs = context.getSharedPreferences("kanzun_support_prefs", Context.MODE_PRIVATE)
         val lastShownTime = prefs.getLong("last_support_dialog_timestamp", 0L)
         val currentTime = System.currentTimeMillis()
@@ -61,6 +71,7 @@ fun AppShell(
             prefs.edit().putLong("last_support_dialog_timestamp", currentTime).apply()
         }
     }
+
 
     LaunchedEffect(Unit) {
         checkAndTriggerSupportDialog()
@@ -119,97 +130,124 @@ fun AppShell(
     }
 
     KanzunTheme(darkTheme = isDarkTheme) {
-        Scaffold(
-            topBar = {
-                if (isMainScreen) {
-                    AppTopBar(
-                        mosqueName = settingsState.mosqueProfile?.name?.ifBlank { "Masjid Agung Al-Mubarak" } ?: "Masjid Agung Al-Mubarak",
-                        mosqueAddress = settingsState.mosqueProfile?.address?.ifBlank { "Jl. Ahmad Yani No. 45, Jakarta" } ?: "Jl. Ahmad Yani No. 45, Jakarta",
+        if (isShowingOpeningScreen) {
+            OpeningScreen(
+                mosqueProfile = settingsState.mosqueProfile,
+                isIdentityCustomized = settingsState.isIdentityCustomized,
+                onTimeout = {
+                    isShowingOpeningScreen = false
+                    if (hasCompletedInitialSetup) {
+                        checkAndTriggerSupportDialog()
+                    }
+                },
+            )
+        } else if (!hasCompletedInitialSetup) {
+            InitialOpeningBalanceScreen(
+                onSaveBalances = { cashCents, bankCents ->
+                    settingsViewModel.saveInitialOpeningBalances(cashCents, bankCents)
+                    hasCompletedInitialSetup = true
+                    checkAndTriggerSupportDialog()
+                },
+                onSkip = {
+                    settingsViewModel.completeInitialSetup()
+                    hasCompletedInitialSetup = true
+                    checkAndTriggerSupportDialog()
+                },
+            )
+        } else {
+            Scaffold(
+                topBar = {
+                    if (isMainScreen) {
+                        AppTopBar(
+                            mosqueName = settingsState.mosqueProfile?.name?.ifBlank { "Masjid Agung Al-Mubarak" } ?: "Masjid Agung Al-Mubarak",
+                            mosqueAddress = settingsState.mosqueProfile?.address?.ifBlank { "Jl. Ahmad Yani No. 45, Jakarta" } ?: "Jl. Ahmad Yani No. 45, Jakarta",
+                            isDarkTheme = isDarkTheme,
+                            onToggleTheme = { isDarkTheme = !isDarkTheme },
+                            unreadCount = unreadCount,
+                            onNotificationClick = {
+                                navController.navigate(Screen.Notifications.route)
+                            },
+                        )
+                    } else if (isIsolatedScreen) {
+                        val isolatedTitle = when (currentRoute) {
+                            Screen.CashFlow.route -> "Arus Kas"
+                            Screen.Assets.route -> "Aset Masjid"
+                            Screen.Zakat.route -> "Zakat"
+                            Screen.Fundraising.route -> "Target Dana"
+                            Screen.Budget.route -> "RAPBM"
+                            Screen.About.route -> "Tentang Aplikasi"
+                            Screen.PdfPreview.route -> "Preview Surat Laporan"
+                            else -> ""
+                        }
+                        IsolatedFeatureTopBar(
+                            title = isolatedTitle,
+                            onBackClick = { navController.popBackStack() },
+                        )
+                    } else {
+                        val featureTitle = when (currentRoute) {
+                            Screen.Audit.route -> "Audit Trail"
+                            Screen.Notifications.route -> "Notifikasi"
+                            "preview" -> "Galeri Komponen UI"
+                            else -> "Kanzun"
+                        }
+
+                        ContextualFeatureHeader(
+                            title = featureTitle,
+                            onBackClick = { navController.popBackStack() },
+                        )
+                    }
+                },
+                snackbarHost = { SnackbarHost(snackbarHostState) },
+                containerColor = MaterialTheme.colorScheme.background,
+            ) { innerPadding ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding),
+                ) {
+                    KanzunNavHost(
+                        navController = navController,
+                        pagerState = pagerState,
                         isDarkTheme = isDarkTheme,
                         onToggleTheme = { isDarkTheme = !isDarkTheme },
-                        unreadCount = unreadCount,
-                        onNotificationClick = {
-                            navController.navigate(Screen.Notifications.route)
-                        },
                     )
-                } else if (isIsolatedScreen) {
-                    val isolatedTitle = when (currentRoute) {
-                        Screen.CashFlow.route -> "Arus Kas"
-                        Screen.Assets.route -> "Aset Masjid"
-                        Screen.Zakat.route -> "Zakat"
-                        Screen.Fundraising.route -> "Target Dana"
-                        Screen.Budget.route -> "RAPBM"
-                        Screen.About.route -> "Tentang Aplikasi"
-                        Screen.PdfPreview.route -> "Preview Surat Laporan"
-                        else -> ""
-                    }
-                    IsolatedFeatureTopBar(
-                        title = isolatedTitle,
-                        onBackClick = { navController.popBackStack() },
-                    )
-                } else {
-                    val featureTitle = when (currentRoute) {
-                        Screen.Audit.route -> "Audit Trail"
-                        Screen.Notifications.route -> "Notifikasi"
-                        "preview" -> "Galeri Komponen UI"
-                        else -> "Kanzun"
-                    }
 
-                    ContextualFeatureHeader(
-                        title = featureTitle,
-                        onBackClick = { navController.popBackStack() },
-                    )
-                }
-            },
-            snackbarHost = { SnackbarHost(snackbarHostState) },
-            containerColor = MaterialTheme.colorScheme.background,
-        ) { innerPadding ->
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding),
-            ) {
-                KanzunNavHost(
-                    navController = navController,
-                    pagerState = pagerState,
-                    isDarkTheme = isDarkTheme,
-                    onToggleTheme = { isDarkTheme = !isDarkTheme },
-                )
-
-                if (isMainScreen) {
-                    FloatingNavBar(
-                        currentRoute = activeMainRoute,
-                        onItemSelected = { route ->
-                            val targetIndex = when (route) {
-                                Screen.Dashboard.route -> 0
-                                Screen.Treasurer.route -> 1
-                                Screen.Reports.route -> 2
-                                Screen.Settings.route -> 3
-                                else -> 0
-                            }
-                            if (pagerState.currentPage != targetIndex) {
-                                scope.launch {
-                                    pagerState.animateScrollToPage(targetIndex)
+                    if (isMainScreen) {
+                        FloatingNavBar(
+                            currentRoute = activeMainRoute,
+                            onItemSelected = { route ->
+                                val targetIndex = when (route) {
+                                    Screen.Dashboard.route -> 0
+                                    Screen.Treasurer.route -> 1
+                                    Screen.Reports.route -> 2
+                                    Screen.Settings.route -> 3
+                                    else -> 0
                                 }
-                            }
-                            if (currentRoute != "main_pager" && currentRoute !in mainRoutes) {
-                                navController.navigate("main_pager") {
-                                    popUpTo("main_pager") { saveState = true }
-                                    launchSingleTop = true
-                                    restoreState = true
+                                if (pagerState.currentPage != targetIndex) {
+                                    scope.launch {
+                                        pagerState.animateScrollToPage(targetIndex)
+                                    }
                                 }
-                            }
-                        },
-                        modifier = Modifier.align(Alignment.BottomCenter),
-                    )
+                                if (currentRoute != "main_pager" && currentRoute !in mainRoutes) {
+                                    navController.navigate("main_pager") {
+                                        popUpTo("main_pager") { saveState = true }
+                                        launchSingleTop = true
+                                        restoreState = true
+                                    }
+                                }
+                            },
+                            modifier = Modifier.align(Alignment.BottomCenter),
+                        )
+                    }
                 }
             }
-        }
 
-        if (showSupportDialog) {
-            SupportDonationDialog(
-                onDismiss = { showSupportDialog = false },
-            )
+            if (showSupportDialog) {
+                SupportDonationDialog(
+                    onDismiss = { showSupportDialog = false },
+                )
+            }
         }
     }
 }
+

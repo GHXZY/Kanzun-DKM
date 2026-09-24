@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -24,6 +25,7 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.unit.dp
@@ -103,15 +105,17 @@ fun BudgetGroupedBarChart(
                         val canvasHeight = size.height
                         val canvasWidth = size.width
 
-                        // Draw background grid lines
+                        // Draw background grid lines (Dashed Hairline)
                         val steps = 3
+                        val dashEffect = PathEffect.dashPathEffect(floatArrayOf(6f, 6f), 0f)
                         for (i in 0..steps) {
                             val y = canvasHeight * (1f - i.toFloat() / steps)
                             drawLine(
                                 color = gridLineColor,
                                 start = Offset(0f, y),
                                 end = Offset(canvasWidth, y),
-                                strokeWidth = 1.dp.toPx(),
+                                strokeWidth = 0.5.dp.toPx(),
+                                pathEffect = dashEffect,
                             )
                         }
 
@@ -194,8 +198,8 @@ private fun LegendItem(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Surface(
-            modifier = Modifier.size(10.dp),
-            shape = CircleShape,
+            modifier = Modifier.size(8.dp),
+            shape = RoundedCornerShape(2.dp),
             color = color,
         ) {}
         Text(

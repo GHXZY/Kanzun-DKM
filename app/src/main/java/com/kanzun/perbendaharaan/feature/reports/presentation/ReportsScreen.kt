@@ -58,12 +58,16 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.kanzun.perbendaharaan.core.database.entity.TransactionEntity
 import com.kanzun.perbendaharaan.core.designsystem.KanzunShapes
 import com.kanzun.perbendaharaan.core.designsystem.Spacing
 import com.kanzun.perbendaharaan.core.designsystem.components.AppCard
+import com.kanzun.perbendaharaan.core.designsystem.components.AppOutlinedButton
 import com.kanzun.perbendaharaan.core.designsystem.components.AppTextField
 import com.kanzun.perbendaharaan.core.designsystem.components.ChipStatusType
 import com.kanzun.perbendaharaan.core.designsystem.components.EmptyState
@@ -175,19 +179,12 @@ fun ReportsScreen(
             )
 
             // 2. PERIOD FILTER (Presets)
-            SingleChoiceSegmentedButtonRow(
+            SegmentedControl(
+                options = presets,
+                selectedIndex = uiState.selectedPresetIndex,
+                onOptionSelected = { viewModel.applyPeriodPreset(it) },
                 modifier = Modifier.fillMaxWidth(),
-            ) {
-                presets.forEachIndexed { index, title ->
-                    SegmentedButton(
-                        selected = uiState.selectedPresetIndex == index,
-                        onClick = { viewModel.applyPeriodPreset(index) },
-                        shape = SegmentedButtonDefaults.itemShape(index = index, count = presets.size),
-                    ) {
-                        Text(title, style = MaterialTheme.typography.labelSmall)
-                    }
-                }
-            }
+            )
 
             // 3. FINANCIAL SUMMARY (3-Card Metrics Row)
             SectionHeader(
@@ -329,7 +326,8 @@ fun ReportsScreen(
                         Text(
                             text = dateHeader,
                             style = MaterialTheme.typography.labelLarge,
-                            fontWeight = FontWeight.Bold,
+                            fontWeight = FontWeight.SemiBold,
+                            letterSpacing = (-0.2).sp,
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(vertical = Spacing.XS),
                         )
@@ -374,7 +372,7 @@ fun ReportsScreen(
         ModalBottomSheet(
             onDismissRequest = { viewModel.closeExportBottomSheet() },
             sheetState = sheetState,
-            scrimColor = Color.Black.copy(alpha = 0.70f),
+            scrimColor = Color(0x73061B31),
             containerColor = MaterialTheme.colorScheme.surface,
             tonalElevation = 0.dp,
             shape = KanzunShapes.BottomSheet,
@@ -390,7 +388,8 @@ fun ReportsScreen(
                 Text(
                     text = "Download Laporan",
                     style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.SemiBold,
+                    letterSpacing = (-0.4).sp,
                 )
 
                 Text(
@@ -402,8 +401,9 @@ fun ReportsScreen(
                 // 1. PILIH JENIS LAPORAN
                 Text(
                     text = "Pilih Jenis Laporan Surat",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.SemiBold,
+                    letterSpacing = (-0.2).sp,
                     color = MaterialTheme.colorScheme.primary,
                 )
 
@@ -426,12 +426,13 @@ fun ReportsScreen(
                                 Text(
                                     text = type.title,
                                     style = MaterialTheme.typography.bodyMedium,
-                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                                    fontWeight = if (isSelected) FontWeight.Medium else FontWeight.Normal,
                                     color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
                                 )
                                 Text(
                                     text = type.description,
                                     style = MaterialTheme.typography.bodySmall,
+                                    fontWeight = FontWeight.Normal,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                             }
@@ -444,8 +445,9 @@ fun ReportsScreen(
                 // 2. PILIH WAKTU / PERIODE DARI POPUP
                 Text(
                     text = "Pilih Periode Waktu Laporan",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.SemiBold,
+                    letterSpacing = (-0.2).sp,
                     color = MaterialTheme.colorScheme.primary,
                 )
 
@@ -503,51 +505,43 @@ fun ReportsScreen(
                             Text(
                                 text = "Periode Terpilih: ${dateFmt.format(Date(startVal))} s.d. ${dateFmt.format(Date(endVal))}",
                                 style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.Bold,
+                                fontWeight = FontWeight.Normal,
+                                letterSpacing = (-0.2).sp,
                                 color = MaterialTheme.colorScheme.primary,
                             )
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.spacedBy(Spacing.SM),
                             ) {
-                                OutlinedButton(
+                                AppOutlinedButton(
+                                    text = "7 Hari Terakhir",
                                     onClick = {
                                         val cal = Calendar.getInstance()
                                         cal.add(Calendar.DAY_OF_MONTH, -7)
                                         viewModel.setPdfCustomDateRange(cal.timeInMillis, System.currentTimeMillis())
                                     },
                                     modifier = Modifier.weight(1f),
-                                ) {
-                                    Text("7 Hari Terakhir", style = MaterialTheme.typography.labelSmall)
-                                }
-                                OutlinedButton(
+                                )
+                                AppOutlinedButton(
+                                    text = "30 Hari Terakhir",
                                     onClick = {
                                         val cal = Calendar.getInstance()
                                         cal.add(Calendar.DAY_OF_MONTH, -30)
                                         viewModel.setPdfCustomDateRange(cal.timeInMillis, System.currentTimeMillis())
                                     },
                                     modifier = Modifier.weight(1f),
-                                ) {
-                                    Text("30 Hari Terakhir", style = MaterialTheme.typography.labelSmall)
-                                }
+                                )
                             }
                         }
                     }
 
                     2 -> { // PRESET CEPAT
-                        SingleChoiceSegmentedButtonRow(
+                        SegmentedControl(
+                            options = presets,
+                            selectedIndex = uiState.selectedPresetIndex,
+                            onOptionSelected = { viewModel.applyPeriodPreset(it) },
                             modifier = Modifier.fillMaxWidth(),
-                        ) {
-                            presets.forEachIndexed { index, title ->
-                                SegmentedButton(
-                                    selected = uiState.selectedPresetIndex == index,
-                                    onClick = { viewModel.applyPeriodPreset(index) },
-                                    shape = SegmentedButtonDefaults.itemShape(index = index, count = presets.size),
-                                ) {
-                                    Text(title, style = MaterialTheme.typography.labelSmall)
-                                }
-                            }
-                        }
+                        )
                     }
                 }
 
@@ -638,16 +632,17 @@ private fun TransactionReportRow(
                 modifier = Modifier.weight(1f),
             ) {
                 Surface(
-                    shape = KanzunShapes.Pill,
+                    shape = RoundedCornerShape(4.dp),
                     color = iconBgColor,
-                    modifier = Modifier.size(40.dp),
+                    border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.outlineVariant),
+                    modifier = Modifier.size(36.dp),
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Icon(
                             imageVector = icon,
                             contentDescription = null,
                             tint = iconColor,
-                            modifier = Modifier.size(20.dp),
+                            modifier = Modifier.size(18.dp),
                         )
                     }
                 }
@@ -657,8 +652,8 @@ private fun TransactionReportRow(
                 Column {
                     Text(
                         text = transaction.title,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Normal,
                         color = MaterialTheme.colorScheme.onSurface,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
@@ -666,6 +661,7 @@ private fun TransactionReportRow(
                     Text(
                         text = "${transaction.categoryId.formatCategoryName()} \u2022 ${transaction.accountId.formatAccountName()}",
                         style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Normal,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
@@ -677,8 +673,9 @@ private fun TransactionReportRow(
 
             Text(
                 text = "$amountPrefix${Money.of(transaction.amountInCents).formatRupiah()}",
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Bold,
+                letterSpacing = (-0.2).sp,
                 color = amountColor,
                 maxLines = 1,
                 softWrap = false,
@@ -703,6 +700,7 @@ private fun DetailRow(label: String, value: String) {
             text = value,
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Bold,
+            letterSpacing = (-0.2).sp,
             color = MaterialTheme.colorScheme.onSurface,
         )
     }
@@ -727,10 +725,10 @@ private fun SuratLaporanPreviewCard(
 
     Surface(
         modifier = modifier.fillMaxWidth(),
-        shape = KanzunShapes.Card,
+        shape = RoundedCornerShape(8.dp),
         color = Color.White,
-        shadowElevation = 4.dp,
-        border = BorderStroke(1.dp, Color(0xFFCBD5E1)),
+        shadowElevation = 1.dp,
+        border = BorderStroke(1.dp, Color(0xFFE5EDF5)),
     ) {
         Column(
             modifier = Modifier
@@ -748,13 +746,16 @@ private fun SuratLaporanPreviewCard(
                     Image(
                         bitmap = logoBitmap,
                         contentDescription = "Logo Masjid",
-                        modifier = Modifier.size(44.dp),
+                        modifier = Modifier
+                            .size(44.dp)
+                            .clip(RoundedCornerShape(4.dp)),
                     )
                 } else {
                     Surface(
                         modifier = Modifier.size(44.dp),
-                        shape = KanzunShapes.Pill,
-                        color = Color(0xFFF1F5F9),
+                        shape = RoundedCornerShape(4.dp),
+                        color = Color(0xFFF8FAFC),
+                        border = BorderStroke(1.dp, Color(0xFFE5EDF5)),
                     ) {
                         Box(contentAlignment = Alignment.Center) {
                             Icon(
@@ -771,17 +772,20 @@ private fun SuratLaporanPreviewCard(
                     Text(
                         text = reportContent.mosqueName,
                         style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.SemiBold,
+                        letterSpacing = (-0.4).sp,
                         color = Color(0xFF0F172A),
                     )
                     Text(
                         text = reportContent.mosqueAddress,
                         style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Normal,
                         color = Color(0xFF475569),
                     )
                     Text(
                         text = "Telp: ${reportContent.mosquePhone} \u2022 Email: ${reportContent.mosqueEmail}",
                         style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Normal,
                         color = Color(0xFF64748B),
                     )
                 }
@@ -791,7 +795,7 @@ private fun SuratLaporanPreviewCard(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(2.dp)
+                    .height(1.dp)
                     .background(Color(0xFF0F172A)),
             )
 
@@ -801,7 +805,8 @@ private fun SuratLaporanPreviewCard(
             Text(
                 text = "SURAT LAPORAN ${reportContent.reportType.title.uppercase()}",
                 style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.Bold,
+                fontWeight = FontWeight.SemiBold,
+                letterSpacing = (-0.2).sp,
                 color = Color(0xFF0F172A),
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center,
@@ -809,6 +814,7 @@ private fun SuratLaporanPreviewCard(
             Text(
                 text = "Periode: ${reportContent.periodLabel}",
                 style = MaterialTheme.typography.bodySmall,
+                fontWeight = FontWeight.Normal,
                 color = Color(0xFF475569),
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center,
@@ -817,9 +823,9 @@ private fun SuratLaporanPreviewCard(
             // 3. RINGKASAN
             if (reportContent.summaries.isNotEmpty()) {
                 Surface(
-                    shape = KanzunShapes.Card,
+                    shape = RoundedCornerShape(4.dp),
                     color = Color(0xFFF8FAFC),
-                    border = BorderStroke(1.dp, Color(0xFFE2E8F0)),
+                    border = BorderStroke(1.dp, Color(0xFFE5EDF5)),
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Column(
@@ -840,6 +846,7 @@ private fun SuratLaporanPreviewCard(
                                     text = item.value,
                                     style = MaterialTheme.typography.bodySmall,
                                     fontWeight = FontWeight.Bold,
+                                    letterSpacing = (-0.2).sp,
                                     color = Color(0xFF0F172A),
                                 )
                             }
@@ -853,20 +860,21 @@ private fun SuratLaporanPreviewCard(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .border(1.dp, Color(0xFFCBD5E1)),
+                        .clip(RoundedCornerShape(4.dp))
+                        .border(1.dp, Color(0xFFE5EDF5), RoundedCornerShape(4.dp)),
                 ) {
                     // Header Bar
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(Color(0xFF1E293B))
-                            .padding(vertical = 6.dp, horizontal = 4.dp),
+                            .background(Color(0xFF0F172A))
+                            .padding(vertical = 6.dp, horizontal = 6.dp),
                     ) {
                         reportContent.tableHeaders.forEach { header ->
                             Text(
                                 text = header,
                                 style = MaterialTheme.typography.labelSmall,
-                                fontWeight = FontWeight.Bold,
+                                fontWeight = FontWeight.SemiBold,
                                 color = Color.White,
                                 modifier = Modifier.weight(1f),
                                 maxLines = 1,
@@ -882,12 +890,14 @@ private fun SuratLaporanPreviewCard(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .background(bg)
-                                .padding(vertical = 4.dp, horizontal = 4.dp),
+                                .padding(vertical = 4.dp, horizontal = 6.dp),
                         ) {
                             row.columns.forEach { text ->
                                 Text(
                                     text = text,
                                     style = MaterialTheme.typography.labelSmall,
+                                    fontWeight = FontWeight.Normal,
+                                    letterSpacing = (-0.2).sp,
                                     color = Color(0xFF334155),
                                     modifier = Modifier.weight(1f),
                                     maxLines = 1,
@@ -900,6 +910,7 @@ private fun SuratLaporanPreviewCard(
                         Text(
                             text = "... dan ${reportContent.tableRows.size - 8} baris lainnya dalam dokumen PDF",
                             style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Normal,
                             color = Color(0xFF64748B),
                             modifier = Modifier.padding(6.dp),
                         )
@@ -934,14 +945,14 @@ private fun SuratLaporanPreviewCard(
             ) {
                 Column(horizontalAlignment = Alignment.Start) {
                     Text("Mengetahui,", style = MaterialTheme.typography.labelSmall, color = Color(0xFF475569))
-                    Text("Ketua DKM Masjid", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, color = Color(0xFF0F172A))
+                    Text("Ketua DKM Masjid", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Normal, color = Color(0xFF0F172A))
                     Spacer(modifier = Modifier.height(36.dp))
                     Text("( ${reportContent.chairmanName} )", style = MaterialTheme.typography.labelSmall, color = Color(0xFF0F172A))
                 }
 
                 Column(horizontalAlignment = Alignment.Start) {
                     Text("Dibuat oleh,", style = MaterialTheme.typography.labelSmall, color = Color(0xFF475569))
-                    Text("Bendahara", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, color = Color(0xFF0F172A))
+                    Text("Bendahara", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Normal, color = Color(0xFF0F172A))
                     Spacer(modifier = Modifier.height(36.dp))
                     Text("( ${reportContent.treasurerName} )", style = MaterialTheme.typography.labelSmall, color = Color(0xFF0F172A))
                 }

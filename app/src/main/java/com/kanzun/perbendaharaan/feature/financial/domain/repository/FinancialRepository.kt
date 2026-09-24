@@ -62,6 +62,7 @@ interface FinancialRepository {
 
     suspend fun addAccount(account: AccountEntity)
     fun getActiveAccounts(): Flow<List<AccountEntity>>
+    suspend fun updateOpeningBalance(accountId: String, openingBalanceInCents: Long)
     suspend fun addFund(fund: FundEntity)
     fun getActiveFunds(): Flow<List<FundEntity>>
 }

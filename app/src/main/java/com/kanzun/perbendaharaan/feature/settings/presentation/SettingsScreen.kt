@@ -57,6 +57,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
@@ -65,6 +67,7 @@ import com.kanzun.perbendaharaan.core.database.entity.BackupMetadataEntity
 import com.kanzun.perbendaharaan.core.designsystem.KanzunShapes
 import com.kanzun.perbendaharaan.core.designsystem.Spacing
 import com.kanzun.perbendaharaan.core.designsystem.components.AppCard
+import com.kanzun.perbendaharaan.core.designsystem.components.AppOutlinedButton
 import com.kanzun.perbendaharaan.core.designsystem.components.AppDialog as Dialog
 import com.kanzun.perbendaharaan.core.designsystem.components.AppTextField as OutlinedTextField
 import com.kanzun.perbendaharaan.core.designsystem.components.ChipStatusType
@@ -103,6 +106,14 @@ fun SettingsScreen(
     var dkmChairmanName by remember(uiState.mosqueProfile) {
         mutableStateOf(uiState.mosqueProfile?.dkmChairmanName?.ifBlank { "H. Ahmad Dahlan" } ?: "H. Ahmad Dahlan")
     }
+
+    var cashOpeningBalanceText by remember(uiState.cashOpeningBalance) {
+        mutableStateOf(if (uiState.cashOpeningBalance > 0) uiState.cashOpeningBalance.toString() else "")
+    }
+    var bankOpeningBalanceText by remember(uiState.bankOpeningBalance) {
+        mutableStateOf(if (uiState.bankOpeningBalance > 0) uiState.bankOpeningBalance.toString() else "")
+    }
+
 
     val logoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
@@ -145,7 +156,7 @@ fun SettingsScreen(
                     Text(
                         text = "Identitas Masjid",
                         style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.Normal,
                         color = MaterialTheme.colorScheme.primary,
                     )
 
@@ -160,8 +171,9 @@ fun SettingsScreen(
 
                         Surface(
                             modifier = Modifier.size(80.dp),
-                            shape = KanzunShapes.Card,
-                            color = MaterialTheme.colorScheme.primaryContainer,
+                            shape = RoundedCornerShape(4.dp),
+                            color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
                         ) {
                             Box(contentAlignment = Alignment.Center) {
                                 if (logoFile != null && logoFile.exists()) {
@@ -172,7 +184,9 @@ fun SettingsScreen(
                                         Image(
                                             bitmap = bitmap.asImageBitmap(),
                                             contentDescription = "Logo Masjid",
-                                            modifier = Modifier.fillMaxSize(),
+                                            modifier = Modifier
+                                                .fillMaxSize()
+                                                .clip(RoundedCornerShape(4.dp)),
                                         )
                                     } else {
                                         Icon(
@@ -197,20 +211,14 @@ fun SettingsScreen(
                             Text(
                                 text = "Logo Masjid",
                                 style = MaterialTheme.typography.titleSmall,
-                                fontWeight = FontWeight.Bold,
+                                fontWeight = FontWeight.Normal,
                             )
                             Row(horizontalArrangement = Arrangement.spacedBy(Spacing.XS)) {
-                                OutlinedButton(
+                                AppOutlinedButton(
+                                    text = if (logoPath.isEmpty()) "Pilih Logo" else "Ubah Logo",
+                                    icon = Icons.Default.Image,
                                     onClick = { logoPickerLauncher.launch("image/*") },
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Image,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(18.dp),
-                                    )
-                                    Spacer(modifier = Modifier.width(Spacing.XS))
-                                    Text(if (logoPath.isEmpty()) "Pilih Logo" else "Ubah Logo")
-                                }
+                                )
 
                                 if (logoPath.isNotEmpty()) {
                                     IconButton(onClick = { viewModel.removeLogo() }) {
@@ -250,7 +258,7 @@ fun SettingsScreen(
                     Text(
                         text = "Pengurus / Penanggung Jawab",
                         style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.Normal,
                         color = MaterialTheme.colorScheme.primary,
                     )
 
@@ -289,13 +297,107 @@ fun SettingsScreen(
                 fullWidth = true,
             )
 
+            // CARD: SALDO AWAL (KAS TUNAI & REKENING BANK)
+            AppCard(modifier = Modifier.fillMaxWidth()) {
+                Column(verticalArrangement = Arrangement.spacedBy(Spacing.SM)) {
+                    Text(
+                        text = "Saldo Awal",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Normal,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                    Text(
+                        text = "Atur saldo awal untuk akun kas tunai dan rekening bank masjid.",
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Normal,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+
+                    OutlinedTextField(
+                        value = cashOpeningBalanceText,
+                        onValueChange = { input ->
+                            if (input.all { it.isDigit() }) cashOpeningBalanceText = input
+                        },
+                        label = { Text("Saldo Awal Kas Tunai (Rp)") },
+                        prefix = { Text("Rp ") },
+                        placeholder = { Text("0") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true,
+                    )
+
+                    OutlinedTextField(
+                        value = bankOpeningBalanceText,
+                        onValueChange = { input ->
+                            if (input.all { it.isDigit() }) bankOpeningBalanceText = input
+                        },
+                        label = { Text("Saldo Awal Rekening Bank (Rp)") },
+                        prefix = { Text("Rp ") },
+                        placeholder = { Text("0") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true,
+                    )
+
+                    Spacer(modifier = Modifier.height(Spacing.XS))
+
+                    PrimaryButton(
+                        text = "Simpan Saldo Awal",
+                        onClick = {
+                            val cashCents = cashOpeningBalanceText.toLongOrNull() ?: 0L
+                            val bankCents = bankOpeningBalanceText.toLongOrNull() ?: 0L
+                            viewModel.saveOpeningBalances(cashCents, bankCents)
+                        },
+                        icon = Icons.Default.Save,
+                        fullWidth = true,
+                    )
+                }
+            }
+
+            // CARD: TAMPILAN & TEMA (MODE GELAP)
+            AppCard(modifier = Modifier.fillMaxWidth()) {
+                Column(verticalArrangement = Arrangement.spacedBy(Spacing.SM)) {
+                    Text(
+                        text = "Tampilan & Tema",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Normal,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = "Mode Gelap (Dark Mode)",
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.Normal,
+                            )
+                            Text(
+                                text = "Gunakan tema gelap untuk kenyamanan mata dan efisiensi baterai",
+                                style = MaterialTheme.typography.bodySmall,
+                                fontWeight = FontWeight.Normal,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+
+                        Switch(
+                            checked = isDarkTheme,
+                            onCheckedChange = { onToggleTheme() },
+                        )
+                    }
+                }
+            }
+
             // CARD 3: KEAMANAN & PIN
             AppCard(modifier = Modifier.fillMaxWidth()) {
                 Column(verticalArrangement = Arrangement.spacedBy(Spacing.SM)) {
                     Text(
                         text = "Keamanan & Akses PIN",
                         style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.Normal,
                         color = MaterialTheme.colorScheme.primary,
                     )
 
@@ -308,11 +410,12 @@ fun SettingsScreen(
                             Text(
                                 text = "Gunakan PIN Keamanan",
                                 style = MaterialTheme.typography.titleSmall,
-                                fontWeight = FontWeight.Bold,
+                                fontWeight = FontWeight.Normal,
                             )
                             Text(
                                 text = "Minta PIN 6-digit setiap kali membuka perbendaharaan",
                                 style = MaterialTheme.typography.bodySmall,
+                                fontWeight = FontWeight.Normal,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         }
@@ -346,15 +449,11 @@ fun SettingsScreen(
                         }
 
                         if (uiState.securityPinEnabled) {
-                            OutlinedButton(onClick = { viewModel.openSetPinDialog() }) {
-                                Icon(
-                                    imageVector = Icons.Default.Lock,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(16.dp),
-                                )
-                                Spacer(modifier = Modifier.width(Spacing.XS))
-                                Text("Ubah PIN")
-                            }
+                            AppOutlinedButton(
+                                text = "Ubah PIN",
+                                icon = Icons.Default.Lock,
+                                onClick = { viewModel.openSetPinDialog() },
+                            )
                         }
                     }
                 }
@@ -366,13 +465,14 @@ fun SettingsScreen(
                     Text(
                         text = "Backup & Restore Data",
                         style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.Normal,
                         color = MaterialTheme.colorScheme.primary,
                     )
 
                     Text(
                         text = "Amankan seluruh database perbendaharaan masjid secara rutin untuk mencegah kehilangan data.",
                         style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Normal,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
 
@@ -388,7 +488,8 @@ fun SettingsScreen(
                         Text(
                             text = "Riwayat Backup (${uiState.backups.size})",
                             style = MaterialTheme.typography.labelLarge,
-                            fontWeight = FontWeight.Bold,
+                            fontWeight = FontWeight.Normal,
+                            letterSpacing = (-0.2).sp,
                             color = MaterialTheme.colorScheme.onSurface,
                         )
 
@@ -412,9 +513,9 @@ fun SettingsScreen(
             // CARD 5: RESET DATA APLIKASI
             Surface(
                 modifier = Modifier.fillMaxWidth(),
-                shape = KanzunShapes.Card,
-                color = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.35f),
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.error.copy(alpha = 0.5f)),
+                shape = RoundedCornerShape(6.dp),
+                color = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.2f),
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.error.copy(alpha = 0.35f)),
             ) {
                 Column(
                     modifier = Modifier.padding(Spacing.MD),
@@ -432,7 +533,7 @@ fun SettingsScreen(
                         Text(
                             text = "Reset Data Aplikasi",
                             style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
+                            fontWeight = FontWeight.Normal,
                             color = MaterialTheme.colorScheme.error,
                         )
                     }
@@ -440,25 +541,18 @@ fun SettingsScreen(
                     Text(
                         text = "Mereset seluruh data transaksi, RAPBM, zakat, dan perbendaharaan kembali ke data awal. Tindakan ini permanen dan tidak dapat dibatalkan!",
                         style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Normal,
                         color = MaterialTheme.colorScheme.onErrorContainer,
                     )
 
-                    Button(
+                    PrimaryButton(
+                        text = "Reset Seluruh Data Aplikasi",
+                        icon = Icons.Default.Refresh,
+                        containerColor = MaterialTheme.colorScheme.error,
+                        contentColor = MaterialTheme.colorScheme.onError,
                         onClick = { viewModel.openResetConfirmDialog() },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.error,
-                            contentColor = MaterialTheme.colorScheme.onError,
-                        ),
-                        modifier = Modifier.fillMaxWidth(),
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Refresh,
-                            contentDescription = null,
-                            modifier = Modifier.size(18.dp),
-                        )
-                        Spacer(modifier = Modifier.width(Spacing.XS))
-                        Text("Reset Seluruh Data Aplikasi", fontWeight = FontWeight.Bold)
-                    }
+                        fullWidth = true,
+                    )
                 }
             }
 
@@ -477,15 +571,17 @@ fun SettingsScreen(
                         horizontalArrangement = Arrangement.spacedBy(Spacing.SM),
                     ) {
                         Surface(
-                            modifier = Modifier.size(40.dp),
-                            shape = KanzunShapes.SmallComponent,
+                            modifier = Modifier.size(38.dp),
+                            shape = RoundedCornerShape(4.dp),
                             color = MaterialTheme.colorScheme.secondaryContainer,
+                            border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.outlineVariant),
                         ) {
                             Box(contentAlignment = Alignment.Center) {
                                 Icon(
                                     imageVector = Icons.Default.Info,
                                     contentDescription = null,
                                     tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                                    modifier = Modifier.size(18.dp),
                                 )
                             }
                         }
@@ -494,11 +590,12 @@ fun SettingsScreen(
                             Text(
                                 text = "Tentang Aplikasi",
                                 style = MaterialTheme.typography.titleSmall,
-                                fontWeight = FontWeight.Bold,
+                                fontWeight = FontWeight.Normal,
                             )
                             Text(
                                 text = "Versi 1.0.0 \u2022 Informasi Sistem & Lisensi",
                                 style = MaterialTheme.typography.bodySmall,
+                                fontWeight = FontWeight.Normal,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         }
@@ -508,6 +605,7 @@ fun SettingsScreen(
                         imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                         contentDescription = "Buka",
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(18.dp),
                     )
                 }
             }
@@ -550,8 +648,9 @@ private fun BackupItemRow(
 
     Surface(
         modifier = modifier.fillMaxWidth(),
-        shape = KanzunShapes.SmallComponent,
-        color = MaterialTheme.colorScheme.surfaceVariant,
+        shape = RoundedCornerShape(4.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
     ) {
         Row(
             modifier = Modifier
@@ -564,24 +663,22 @@ private fun BackupItemRow(
                 Text(
                     text = dateText,
                     style = MaterialTheme.typography.bodySmall,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.Normal,
+                    letterSpacing = (-0.2).sp,
                 )
                 Text(
                     text = "$sizeKb KB \u2022 Version ${backup.dbVersion}",
                     style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.Normal,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
 
-            OutlinedButton(onClick = onRestore) {
-                Icon(
-                    imageVector = Icons.Default.Restore,
-                    contentDescription = null,
-                    modifier = Modifier.size(16.dp),
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text("Restore", style = MaterialTheme.typography.labelSmall)
-            }
+            AppOutlinedButton(
+                text = "Restore",
+                icon = Icons.Default.Restore,
+                onClick = onRestore,
+            )
         }
     }
 }
@@ -601,9 +698,11 @@ private fun SetPinDialog(
         properties = DialogProperties(usePlatformDefaultWidth = false),
     ) {
         Surface(
-            shape = KanzunShapes.Card,
+            shape = RoundedCornerShape(8.dp),
             color = MaterialTheme.colorScheme.surface,
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
             tonalElevation = 0.dp,
+            shadowElevation = 1.dp,
             modifier = Modifier
                 .fillMaxWidth()
                 .widthIn(max = 450.dp)
@@ -626,14 +725,16 @@ private fun SetPinDialog(
                     )
                     Text(
                         text = "Atur PIN Keamanan",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Normal,
+                        letterSpacing = (-0.2).sp,
                     )
                 }
 
                 Text(
                     text = "Masukkan 6-digit PIN keamanan untuk melindungi akses data perbendaharaan masjid.",
                     style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Normal,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
 
@@ -715,9 +816,11 @@ private fun ResetConfirmDialog(
         properties = DialogProperties(usePlatformDefaultWidth = false),
     ) {
         Surface(
-            shape = KanzunShapes.Card,
+            shape = RoundedCornerShape(8.dp),
             color = MaterialTheme.colorScheme.surface,
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.error.copy(alpha = 0.35f)),
             tonalElevation = 0.dp,
+            shadowElevation = 1.dp,
             modifier = Modifier
                 .fillMaxWidth()
                 .widthIn(max = 450.dp)
@@ -740,8 +843,9 @@ private fun ResetConfirmDialog(
                     )
                     Text(
                         text = "Konfirmasi Reset Data",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Normal,
+                        letterSpacing = (-0.2).sp,
                         color = MaterialTheme.colorScheme.error,
                     )
                 }
@@ -749,13 +853,14 @@ private fun ResetConfirmDialog(
                 Text(
                     text = "PERINGATAN: Seluruh pencatatan kas, transaksi, RAPBM, target dana, dan zakat akan dihapus dan dikembalikan ke kondisi awal!",
                     style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Normal,
                     color = MaterialTheme.colorScheme.onSurface,
                 )
 
                 Text(
                     text = "Ketik 'RESET' di bawah ini untuk mengonfirmasi:",
                     style = MaterialTheme.typography.labelMedium,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.Normal,
                     color = MaterialTheme.colorScheme.error,
                 )
 
@@ -776,17 +881,14 @@ private fun ResetConfirmDialog(
                         onClick = onDismiss,
                         modifier = Modifier.weight(1f),
                     )
-                    Button(
+                    PrimaryButton(
+                        text = "Reset Sekarang",
                         onClick = onConfirmReset,
                         enabled = confirmText.trim() == "RESET",
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.error,
-                            contentColor = MaterialTheme.colorScheme.onError,
-                        ),
+                        containerColor = MaterialTheme.colorScheme.error,
+                        contentColor = MaterialTheme.colorScheme.onError,
                         modifier = Modifier.weight(1f),
-                    ) {
-                        Text("Reset Sekarang", fontWeight = FontWeight.Bold)
-                    }
+                    )
                 }
             }
         }

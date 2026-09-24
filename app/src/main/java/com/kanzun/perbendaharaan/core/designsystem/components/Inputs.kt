@@ -43,7 +43,7 @@ fun AppTextField(
 ) {
     OutlinedTextField(
         value = value, onValueChange = onValueChange,
-        modifier = modifier.heightIn(min = 56.dp).neomorphic(shape, inset = true),
+        modifier = modifier.heightIn(min = 44.dp),
         enabled = enabled, readOnly = readOnly, textStyle = textStyle,
         label = label, placeholder = placeholder, leadingIcon = leadingIcon, trailingIcon = trailingIcon,
         prefix = prefix, suffix = suffix, supportingText = supportingText, isError = isError,
@@ -51,11 +51,16 @@ fun AppTextField(
         keyboardActions = keyboardActions, singleLine = singleLine, maxLines = maxLines,
         minLines = minLines, interactionSource = interactionSource, shape = shape,
         colors = OutlinedTextFieldDefaults.colors(
-            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-            disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-            errorContainerColor = MaterialTheme.colorScheme.errorContainer,
-            unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+            focusedContainerColor = MaterialTheme.colorScheme.surface,
+            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+            disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+            errorContainerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.2f),
+            focusedBorderColor = MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
+            disabledBorderColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
+            errorBorderColor = MaterialTheme.colorScheme.error,
+            cursorColor = MaterialTheme.colorScheme.primary,
         ),
     )
+
 }

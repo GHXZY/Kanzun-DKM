@@ -61,8 +61,8 @@ fun SupportDonationDialog(
             ) {
                 Box(
                     modifier = Modifier
-                        .size(42.dp)
-                        .clip(KanzunShapes.Card)
+                        .size(40.dp)
+                        .clip(KanzunShapes.SmallComponent)
                         .background(MaterialTheme.colorScheme.primaryContainer),
                     contentAlignment = Alignment.Center,
                 ) {
@@ -70,14 +70,16 @@ fun SupportDonationDialog(
                         imageVector = Icons.Default.Favorite,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(22.dp),
+                        modifier = Modifier.size(20.dp),
                     )
                 }
 
                 Text(
                     text = "Berikan Dukungan",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        fontWeight = com.kanzun.perbendaharaan.core.designsystem.TypographyTokens.SemiBold,
+                        letterSpacing = (-0.2).sp,
+                    ),
                     color = MaterialTheme.colorScheme.onSurface,
                 )
             }
@@ -93,10 +95,10 @@ fun SupportDonationDialog(
             // Bank Account Card with Copy Button
             Surface(
                 shape = KanzunShapes.Card,
-                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
                 border = BorderStroke(
                     1.dp,
-                    MaterialTheme.colorScheme.primary.copy(alpha = 0.25f),
+                    MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.8f),
                 ),
                 modifier = Modifier
                     .fillMaxWidth()

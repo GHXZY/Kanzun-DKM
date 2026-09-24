@@ -42,14 +42,16 @@ val ErrorSurface = Color(0xFFFDECEC)
 val InfoLight = Color(0xFF0D47A1)
 val InfoSurface = Color(0xFFE3EEF9)
 
-// Light Mode
-val LightBackground = Color(0xFFEEF2F6)
-val LightSurface = Color(0xFFEEF2F6)
-val LightSurfaceSoft = Color(0xFFE7EDF3)
-val LightTextPrimary = Color(0xFF102033)
-val LightTextSecondary = Color(0xFF526273)
-val LightTextTertiary = Color(0xFF7B8794)
-val LightBorder = Color(0xFFE3E8EF)
+// Light Mode (Stripe Surface & Text Hierarchy)
+val LightBackground = Color(0xFFF8FAFC)
+val LightSurface = Color(0xFFFFFFFF)
+val LightSurfaceSoft = Color(0xFFF1F5F9)
+val LightTextPrimary = Color(0xFF061B31) // Stripe Ink (headings, primary actions)
+val LightTextSecondary = Color(0xFF425466) // Stripe Body (paragraph, descriptions)
+val LightTextTertiary = Color(0xFF64748D) // Stripe Mute (captions, labels, timestamps)
+val LightBorder = Color(0xFFE5EDF5) // Stripe Hairline (#e5edf5)
+val LightBorderStrong = Color(0xFFCBD5E1) // Stripe Hairline Strong
+
 
 // Dark Mode
 val DarkBackground = Color(0xFF08111F)

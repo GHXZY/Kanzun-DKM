@@ -37,7 +37,7 @@ fun ConfirmDialog(
             Text(
                 text = title,
                 style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
+                fontWeight = com.kanzun.perbendaharaan.core.designsystem.TypographyTokens.SemiBold,
             )
         },
         text = {
@@ -103,26 +103,26 @@ fun AppDialog(
                 .imePadding(),
             contentAlignment = androidx.compose.ui.Alignment.Center,
         ) {
-            // Darkened scrim backdrop (70% opacity black)
+            // Stripe navy scrim backdrop (rgba(6, 27, 49, 0.45))
             Box(
                 Modifier
                     .matchParentSize()
-                    .background(Color.Black.copy(alpha = 0.70f))
+                    .background(Color(0x73061B31))
                     .pointerInput(onDismissRequest, properties.dismissOnClickOutside) {
                         detectTapGestures { if (properties.dismissOnClickOutside) onDismissRequest() }
                     }
             )
 
-            // Opaque solid popup container card
+            // Stripe modal card: pure surface, 16dp radius, 1dp hairline border, level 4 elevation
             Surface(
-                shape = KanzunShapes.Card,
+                shape = KanzunShapes.LargeCard,
                 color = MaterialTheme.colorScheme.surface,
-                tonalElevation = 6.dp,
-                shadowElevation = 8.dp,
-                border = androidx.compose.foundation.BorderStroke(1.5.dp, MaterialTheme.colorScheme.outlineVariant),
+                tonalElevation = 0.dp,
+                shadowElevation = 16.dp,
+                border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.8f)),
                 modifier = Modifier
                     .padding(16.dp)
-                    .widthIn(max = 560.dp)
+                    .widthIn(max = 520.dp)
                     .fillMaxWidth()
                     .heightIn(max = maxHeight * 0.9f),
             ) {

@@ -378,39 +378,41 @@ private fun ZakatFabActionItem(
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
         modifier = Modifier.clickable(onClick = onClick),
     ) {
         Surface(
             shape = KanzunShapes.SmallComponent,
             color = MaterialTheme.colorScheme.surface,
             tonalElevation = 0.dp,
-            shadowElevation = 4.dp,
+            shadowElevation = 1.dp,
+            border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
         ) {
             Text(
                 text = label,
                 style = MaterialTheme.typography.labelMedium.copy(
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.SemiBold,
                     fontSize = 13.sp,
                 ),
                 color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
             )
         }
 
         Surface(
-            shape = KanzunShapes.Pill,
+            shape = KanzunShapes.SmallComponent,
             color = MaterialTheme.colorScheme.surface,
             tonalElevation = 0.dp,
-            shadowElevation = 4.dp,
-            modifier = Modifier.size(48.dp),
+            shadowElevation = 1.dp,
+            border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+            modifier = Modifier.size(42.dp),
         ) {
             Box(contentAlignment = Alignment.Center) {
                 Icon(
                     imageVector = icon,
                     contentDescription = label,
                     tint = iconTint,
-                    modifier = Modifier.size(22.dp),
+                    modifier = Modifier.size(20.dp),
                 )
             }
         }
@@ -427,7 +429,7 @@ private fun MuzakkiReceiptRow(tx: ZakatTransactionEntity) {
     AppCard(
         modifier = Modifier
             .fillMaxWidth()
-            .heightIn(min = 68.dp),
+            .heightIn(min = 64.dp),
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -439,16 +441,17 @@ private fun MuzakkiReceiptRow(tx: ZakatTransactionEntity) {
                 modifier = Modifier.weight(1f),
             ) {
                 Surface(
-                    shape = KanzunShapes.Pill,
+                    shape = KanzunShapes.SmallComponent,
                     color = MaterialTheme.colorScheme.secondaryContainer,
-                    modifier = Modifier.size(42.dp),
+                    border = androidx.compose.foundation.BorderStroke(0.5.dp, MaterialTheme.colorScheme.secondary.copy(alpha = 0.25f)),
+                    modifier = Modifier.size(36.dp),
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Icon(
                             imageVector = Icons.Default.ArrowDownward,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.onSecondaryContainer,
-                            modifier = Modifier.size(22.dp),
+                            modifier = Modifier.size(18.dp),
                         )
                     }
                 }
@@ -458,16 +461,17 @@ private fun MuzakkiReceiptRow(tx: ZakatTransactionEntity) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = tx.muzakiOrMustahikName,
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            fontSize = 15.sp,
-                            fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.titleSmall.copy(
+                            fontWeight = FontWeight.Normal,
                         ),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
                     Text(
                         text = "${tx.zakatType} \u2022 $formattedDate",
-                        style = MaterialTheme.typography.bodySmall,
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            fontWeight = FontWeight.Normal,
+                        ),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
@@ -475,7 +479,9 @@ private fun MuzakkiReceiptRow(tx: ZakatTransactionEntity) {
                     if (tx.note.isNotBlank()) {
                         Text(
                             text = tx.note,
-                            style = MaterialTheme.typography.bodySmall,
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                fontWeight = FontWeight.Normal,
+                            ),
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -489,8 +495,8 @@ private fun MuzakkiReceiptRow(tx: ZakatTransactionEntity) {
             Text(
                 text = "+${Money.of(tx.amountInCents).formatRupiah()}",
                 style = MaterialTheme.typography.titleMedium.copy(
-                    fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
+                    letterSpacing = (-0.2).sp,
                 ),
                 color = MaterialTheme.colorScheme.secondary,
                 maxLines = 1,
@@ -509,7 +515,7 @@ private fun MustahikRow(
     AppCard(
         modifier = Modifier
             .fillMaxWidth()
-            .heightIn(min = 68.dp),
+            .heightIn(min = 64.dp),
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -521,16 +527,17 @@ private fun MustahikRow(
                 modifier = Modifier.weight(1f),
             ) {
                 Surface(
-                    shape = KanzunShapes.Pill,
+                    shape = KanzunShapes.SmallComponent,
                     color = MaterialTheme.colorScheme.primaryContainer,
-                    modifier = Modifier.size(42.dp),
+                    border = androidx.compose.foundation.BorderStroke(0.5.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.25f)),
+                    modifier = Modifier.size(36.dp),
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Icon(
                             imageVector = Icons.Default.Person,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                            modifier = Modifier.size(22.dp),
+                            modifier = Modifier.size(18.dp),
                         )
                     }
                 }
@@ -544,9 +551,8 @@ private fun MustahikRow(
                     ) {
                         Text(
                             text = mustahik.name,
-                            style = MaterialTheme.typography.titleMedium.copy(
-                                fontSize = 15.sp,
-                                fontWeight = FontWeight.Bold,
+                            style = MaterialTheme.typography.titleSmall.copy(
+                                fontWeight = FontWeight.Normal,
                             ),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -556,7 +562,9 @@ private fun MustahikRow(
                     }
                     Text(
                         text = mustahik.address.ifBlank { "Alamat tidak diisi" },
-                        style = MaterialTheme.typography.bodySmall,
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            fontWeight = FontWeight.Normal,
+                        ),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
@@ -564,7 +572,9 @@ private fun MustahikRow(
                     if (mustahik.phone.isNotBlank()) {
                         Text(
                             text = mustahik.phone,
-                            style = MaterialTheme.typography.bodySmall,
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                fontWeight = FontWeight.Normal,
+                            ),
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -576,20 +586,20 @@ private fun MustahikRow(
             Spacer(modifier = Modifier.width(Spacing.XS))
 
             Row(verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = onEdit, modifier = Modifier.size(40.dp)) {
+                IconButton(onClick = onEdit, modifier = Modifier.size(36.dp)) {
                     Icon(
                         imageVector = Icons.Default.Edit,
                         contentDescription = "Edit Mustahik",
                         tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(20.dp),
+                        modifier = Modifier.size(18.dp),
                     )
                 }
-                IconButton(onClick = onDelete, modifier = Modifier.size(40.dp)) {
+                IconButton(onClick = onDelete, modifier = Modifier.size(36.dp)) {
                     Icon(
                         imageVector = Icons.Default.Delete,
                         contentDescription = "Hapus Mustahik",
                         tint = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.size(20.dp),
+                        modifier = Modifier.size(18.dp),
                     )
                 }
             }
@@ -607,7 +617,7 @@ private fun PenyaluranRow(tx: ZakatTransactionEntity) {
     AppCard(
         modifier = Modifier
             .fillMaxWidth()
-            .heightIn(min = 68.dp),
+            .heightIn(min = 64.dp),
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -619,16 +629,17 @@ private fun PenyaluranRow(tx: ZakatTransactionEntity) {
                 modifier = Modifier.weight(1f),
             ) {
                 Surface(
-                    shape = KanzunShapes.Pill,
+                    shape = KanzunShapes.SmallComponent,
                     color = MaterialTheme.colorScheme.errorContainer,
-                    modifier = Modifier.size(42.dp),
+                    border = androidx.compose.foundation.BorderStroke(0.5.dp, MaterialTheme.colorScheme.error.copy(alpha = 0.25f)),
+                    modifier = Modifier.size(36.dp),
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Icon(
                             imageVector = Icons.Default.ArrowUpward,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.onErrorContainer,
-                            modifier = Modifier.size(22.dp),
+                            modifier = Modifier.size(18.dp),
                         )
                     }
                 }
@@ -638,16 +649,17 @@ private fun PenyaluranRow(tx: ZakatTransactionEntity) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = tx.muzakiOrMustahikName,
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            fontSize = 15.sp,
-                            fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.titleSmall.copy(
+                            fontWeight = FontWeight.Normal,
                         ),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
                     Text(
                         text = "${tx.zakatType} \u2022 $formattedDate",
-                        style = MaterialTheme.typography.bodySmall,
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            fontWeight = FontWeight.Normal,
+                        ),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
@@ -655,7 +667,9 @@ private fun PenyaluranRow(tx: ZakatTransactionEntity) {
                     if (tx.note.isNotBlank()) {
                         Text(
                             text = tx.note,
-                            style = MaterialTheme.typography.bodySmall,
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                fontWeight = FontWeight.Normal,
+                            ),
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -669,8 +683,8 @@ private fun PenyaluranRow(tx: ZakatTransactionEntity) {
             Text(
                 text = "-${Money.of(tx.amountInCents).formatRupiah()}",
                 style = MaterialTheme.typography.titleMedium.copy(
-                    fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
+                    letterSpacing = (-0.2).sp,
                 ),
                 color = MaterialTheme.colorScheme.error,
                 maxLines = 1,
@@ -729,7 +743,7 @@ private fun MuzakkiFormDialog(
                         text = "Tambah Muzakki",
                         style = MaterialTheme.typography.titleLarge.copy(
                             fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
+                            fontWeight = FontWeight.SemiBold,
                         ),
                         color = MaterialTheme.colorScheme.onSurface,
                     )
@@ -921,7 +935,7 @@ private fun MustahikFormDialog(
                         text = if (isEditMode) "Edit Mustahik" else "Tambah Mustahik",
                         style = MaterialTheme.typography.titleLarge.copy(
                             fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
+                            fontWeight = FontWeight.SemiBold,
                         ),
                         color = MaterialTheme.colorScheme.onSurface,
                     )
@@ -1114,7 +1128,7 @@ private fun PenyaluranFormDialog(
                         text = "Tambah Penyaluran",
                         style = MaterialTheme.typography.titleLarge.copy(
                             fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
+                            fontWeight = FontWeight.SemiBold,
                         ),
                         color = MaterialTheme.colorScheme.onSurface,
                     )

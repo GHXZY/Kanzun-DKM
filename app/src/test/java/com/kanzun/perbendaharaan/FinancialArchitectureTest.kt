@@ -223,6 +223,15 @@ class TestFinancialRepository : FinancialRepository {
 
     override fun getAuditLogs(): Flow<List<AuditLogEntity>> = flowOf(auditLogs)
 
+    override suspend fun updateOpeningBalance(accountId: String, openingBalanceInCents: Long) {
+        val account = accounts[accountId] ?: throw IllegalArgumentException("Account not found: $accountId")
+        val diff = openingBalanceInCents - account.openingBalanceInCents
+        accounts[accountId] = account.copy(
+            openingBalanceInCents = openingBalanceInCents,
+            currentBalanceInCents = account.currentBalanceInCents + diff,
+        )
+    }
+
     override suspend fun addAccount(account: AccountEntity) {
         accounts[account.id] = account
     }
@@ -445,4 +454,15 @@ class FinancialArchitectureTest {
         assertEquals(100_000_000L, diff.amountInCents)
         assertEquals("Rp 133.333.333", sum.formatRupiah())
     }
+
+    // TEST 9: Update opening balance adjusts current balance accurately
+    @Test
+    fun testUpdateOpeningBalance() = runBlocking {
+        // Initial opening balance is 25_000_000L
+        repository.updateOpeningBalance("acc_cash", 35_000_000L) // Increase by 10_000_000L
+        val updatedCash = getAccountBalanceUseCase("acc_cash").amountInCents
+        assertEquals(35_000_000L, updatedCash)
+    }
+
 }
+

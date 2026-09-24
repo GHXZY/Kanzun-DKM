@@ -21,6 +21,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -38,6 +39,7 @@ import com.kanzun.perbendaharaan.R
 import com.kanzun.perbendaharaan.core.designsystem.Elevation
 import com.kanzun.perbendaharaan.core.designsystem.KanzunShapes
 import com.kanzun.perbendaharaan.core.designsystem.Spacing
+import com.kanzun.perbendaharaan.core.designsystem.TypographyTokens
 
 @Composable
 fun SectionHeader(
@@ -55,15 +57,19 @@ fun SectionHeader(
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = title,
-                style = MaterialTheme.typography.headlineSmall,
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = TypographyTokens.SemiBold,
+                    letterSpacing = (-0.2).sp,
+                ),
                 color = MaterialTheme.colorScheme.onBackground,
-                fontWeight = FontWeight.Bold,
             )
             if (subtitle != null) {
-                Spacer(modifier = Modifier.height(Spacing.XS))
+                Spacer(modifier = Modifier.height(2.dp))
                 Text(
                     text = subtitle,
-                    style = MaterialTheme.typography.bodySmall,
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        fontWeight = TypographyTokens.Regular,
+                    ),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
@@ -72,9 +78,10 @@ fun SectionHeader(
             Spacer(modifier = Modifier.width(Spacing.MD))
             Text(
                 text = actionText,
-                style = MaterialTheme.typography.labelLarge,
+                style = MaterialTheme.typography.labelMedium.copy(
+                    fontWeight = TypographyTokens.SemiBold,
+                ),
                 color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.Bold,
                 modifier = Modifier
                     .clip(KanzunShapes.SmallComponent)
                     .clickable { onActionClick() }
@@ -95,106 +102,113 @@ fun AppTopBar(
     hasUnreadNotifications: Boolean = unreadCount > 0,
     modifier: Modifier = Modifier,
 ) {
-    Surface(
-        modifier = modifier.fillMaxWidth().statusBarsPadding(),
-        color = MaterialTheme.colorScheme.background,
-        tonalElevation = Elevation.Level0,
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = Spacing.MD, vertical = Spacing.MDS),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
+    Column(modifier = modifier.fillMaxWidth()) {
+        Surface(
+            modifier = Modifier.fillMaxWidth().statusBarsPadding(),
+            color = MaterialTheme.colorScheme.surface,
+            tonalElevation = Elevation.Level0,
         ) {
             Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = Spacing.MD, vertical = Spacing.SM + 2.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.weight(1f),
+                horizontalArrangement = Arrangement.SpaceBetween,
             ) {
-                Surface(
-                    modifier = Modifier.size(40.dp),
-                    shape = KanzunShapes.SmallComponent,
-                    color = MaterialTheme.colorScheme.primaryContainer,
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.weight(1f),
                 ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Image(
-                            painter = painterResource(id = R.drawable.ic_kanzun_logo),
-                            contentDescription = "Logo Kanzun",
-                            modifier = Modifier.size(28.dp),
+                    Surface(
+                        modifier = Modifier.size(38.dp),
+                        shape = KanzunShapes.SmallComponent,
+                        color = MaterialTheme.colorScheme.primaryContainer,
+                        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+                    ) {
+                        Box(contentAlignment = Alignment.Center) {
+                            Image(
+                                painter = painterResource(id = R.drawable.ic_kanzun_logo),
+                                contentDescription = "Logo Kanzun",
+                                modifier = Modifier.size(26.dp),
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.width(Spacing.MD))
+
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = mosqueName,
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = TypographyTokens.SemiBold,
+                                letterSpacing = (-0.2).sp,
+                            ),
+                            color = MaterialTheme.colorScheme.onBackground,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                        Text(
+                            text = mosqueAddress,
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                fontWeight = TypographyTokens.Regular,
+                            ),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
                         )
                     }
                 }
 
-                Spacer(modifier = Modifier.width(Spacing.MDS))
-
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = mosqueName,
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.onBackground,
-                        fontWeight = FontWeight.Bold,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                    Text(
-                        text = mosqueAddress,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.width(Spacing.SM))
-
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                AppIconButton(
-                    icon = if (isDarkTheme) Icons.Default.LightMode else Icons.Default.DarkMode,
-                    contentDescription = "Ubah Tema",
-                    onClick = onToggleTheme,
-                )
-
                 Spacer(modifier = Modifier.width(Spacing.SM))
 
-                Box {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     AppIconButton(
-                        icon = Icons.Default.Notifications,
-                        contentDescription = "Notifikasi",
-                        onClick = onNotificationClick,
+                        icon = if (isDarkTheme) Icons.Default.LightMode else Icons.Default.DarkMode,
+                        contentDescription = "Ubah Tema",
+                        onClick = onToggleTheme,
                     )
 
-                    if (unreadCount > 0 || hasUnreadNotifications) {
-                        val badgeText = when {
-                            unreadCount > 99 -> "99+"
-                            unreadCount > 0 -> unreadCount.toString()
-                            else -> ""
-                        }
+                    Spacer(modifier = Modifier.width(Spacing.SM))
 
-                        Surface(
-                            modifier = Modifier
-                                .align(Alignment.TopEnd)
-                                .padding(top = 2.dp, end = 2.dp),
-                            shape = KanzunShapes.Pill,
-                            color = MaterialTheme.colorScheme.error,
-                        ) {
-                            Box(
-                                modifier = Modifier.padding(
-                                    horizontal = if (badgeText.isEmpty()) 4.dp else 5.dp,
-                                    vertical = if (badgeText.isEmpty()) 4.dp else 2.dp,
-                                ),
-                                contentAlignment = Alignment.Center,
+                    Box {
+                        AppIconButton(
+                            icon = Icons.Default.Notifications,
+                            contentDescription = "Notifikasi",
+                            onClick = onNotificationClick,
+                        )
+
+                        if (unreadCount > 0 || hasUnreadNotifications) {
+                            val badgeText = when {
+                                unreadCount > 99 -> "99+"
+                                unreadCount > 0 -> unreadCount.toString()
+                                else -> ""
+                            }
+
+                            Surface(
+                                modifier = Modifier
+                                    .align(Alignment.TopEnd)
+                                    .padding(top = 2.dp, end = 2.dp),
+                                shape = KanzunShapes.Pill,
+                                color = MaterialTheme.colorScheme.error,
                             ) {
-                                if (badgeText.isNotEmpty()) {
-                                    Text(
-                                        text = badgeText,
-                                        style = MaterialTheme.typography.labelSmall.copy(
-                                            fontSize = 9.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            lineHeight = 10.sp,
-                                        ),
-                                        color = MaterialTheme.colorScheme.onError,
-                                    )
+                                Box(
+                                    modifier = Modifier.padding(
+                                        horizontal = if (badgeText.isEmpty()) 4.dp else 5.dp,
+                                        vertical = if (badgeText.isEmpty()) 4.dp else 2.dp,
+                                    ),
+                                    contentAlignment = Alignment.Center,
+                                ) {
+                                    if (badgeText.isNotEmpty()) {
+                                        Text(
+                                            text = badgeText,
+                                            style = MaterialTheme.typography.labelSmall.copy(
+                                                fontSize = 9.sp,
+                                                fontWeight = TypographyTokens.SemiBold,
+                                                lineHeight = 10.sp,
+                                            ),
+                                            color = MaterialTheme.colorScheme.onError,
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -202,7 +216,8 @@ fun AppTopBar(
                 }
             }
         }
-    }
+        HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.outlineVariant)
+}
 }
 
 @Composable
@@ -214,60 +229,67 @@ fun ContextualFeatureHeader(
     actionIcon: ImageVector? = null,
     onActionClick: (() -> Unit)? = null,
 ) {
-    Surface(
-        modifier = modifier.fillMaxWidth().statusBarsPadding(),
-        color = MaterialTheme.colorScheme.background,
-        tonalElevation = Elevation.Level0,
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = Spacing.MD, vertical = Spacing.MDS),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
+    Column(modifier = modifier.fillMaxWidth()) {
+        Surface(
+            modifier = Modifier.fillMaxWidth().statusBarsPadding(),
+            color = MaterialTheme.colorScheme.background,
+            tonalElevation = Elevation.Level0,
         ) {
             Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = Spacing.MD, vertical = Spacing.MDS),
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.weight(1f),
+                horizontalArrangement = Arrangement.SpaceBetween,
             ) {
-                AppIconButton(
-                    icon = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Kembali",
-                    onClick = onBackClick,
-                )
-
-                Spacer(modifier = Modifier.width(Spacing.MDS))
-
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = title,
-                        style = MaterialTheme.typography.headlineSmall,
-                        color = MaterialTheme.colorScheme.onBackground,
-                        fontWeight = FontWeight.Bold,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.weight(1f),
+                ) {
+                    AppIconButton(
+                        icon = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Kembali",
+                        onClick = onBackClick,
                     )
-                    if (subtitle != null) {
+
+                    Spacer(modifier = Modifier.width(Spacing.MDS))
+
+                    Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = subtitle,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            text = title,
+                            style = MaterialTheme.typography.titleLarge.copy(
+                                fontWeight = TypographyTokens.SemiBold,
+                                letterSpacing = (-0.2).sp,
+                            ),
+                            color = MaterialTheme.colorScheme.onBackground,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                         )
+                        if (subtitle != null) {
+                            Text(
+                                text = subtitle,
+                                style = MaterialTheme.typography.bodySmall.copy(
+                                    fontWeight = TypographyTokens.Regular,
+                                ),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                        }
                     }
                 }
-            }
 
-            if (actionIcon != null && onActionClick != null) {
-                Spacer(modifier = Modifier.width(Spacing.SM))
-                AppIconButton(
-                    icon = actionIcon,
-                    contentDescription = "Aksi",
-                    onClick = onActionClick,
-                )
+                if (actionIcon != null && onActionClick != null) {
+                    Spacer(modifier = Modifier.width(Spacing.SM))
+                    AppIconButton(
+                        icon = actionIcon,
+                        contentDescription = "Aksi",
+                        onClick = onActionClick,
+                    )
+                }
             }
         }
+        HorizontalDivider(thickness = 0.5.dp, color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f))
     }
 }
 
@@ -277,36 +299,41 @@ fun IsolatedFeatureTopBar(
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Surface(
-        modifier = modifier.fillMaxWidth().statusBarsPadding(),
-        color = MaterialTheme.colorScheme.background,
-        tonalElevation = Elevation.Level0,
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = Spacing.MD, vertical = Spacing.MDS),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
+    Column(modifier = modifier.fillMaxWidth()) {
+        Surface(
+            modifier = Modifier.fillMaxWidth().statusBarsPadding(),
+            color = MaterialTheme.colorScheme.background,
+            tonalElevation = Elevation.Level0,
         ) {
-            AppIconButton(
-                icon = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "Kembali",
-                onClick = onBackClick,
-            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = Spacing.MD, vertical = Spacing.MDS),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                AppIconButton(
+                    icon = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Kembali",
+                    onClick = onBackClick,
+                )
 
-            Text(
-                text = title,
-                modifier = Modifier.weight(1f).padding(start = Spacing.MDS),
-                style = MaterialTheme.typography.titleLarge.copy(
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                ),
-                color = MaterialTheme.colorScheme.onBackground,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
+                Text(
+                    text = title,
+                    modifier = Modifier.weight(1f).padding(start = Spacing.MDS),
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        fontSize = 19.sp,
+                        fontWeight = TypographyTokens.SemiBold,
+                        letterSpacing = (-0.2).sp,
+                    ),
+                    color = MaterialTheme.colorScheme.onBackground,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
         }
+        HorizontalDivider(thickness = 0.5.dp, color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f))
     }
 }
+
 

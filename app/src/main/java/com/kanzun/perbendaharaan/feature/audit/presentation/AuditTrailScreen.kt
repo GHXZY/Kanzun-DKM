@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.kanzun.perbendaharaan.core.designsystem.Spacing
 import com.kanzun.perbendaharaan.core.designsystem.components.AppCard
+import com.kanzun.perbendaharaan.core.designsystem.components.PrimaryButton
 import com.kanzun.perbendaharaan.core.designsystem.components.ChipStatusType
 import com.kanzun.perbendaharaan.core.designsystem.components.SectionHeader
 import com.kanzun.perbendaharaan.core.designsystem.components.StatusChip
@@ -63,17 +64,15 @@ fun AuditTrailScreen(
             subtitle = "Riwayat aktivitas, pembuatan, pengubahan, dan penguncian data",
         )
 
-        Button(
+        PrimaryButton(
+            text = "Export Log Audit Trail ke PDF",
+            icon = Icons.Default.PictureAsPdf,
             onClick = {
                 viewModel.selectReportType(ReportType.AUDIT_TRAIL)
                 viewModel.exportPdf(context)
             },
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            Icon(imageVector = Icons.Default.PictureAsPdf, contentDescription = null)
-            Spacer(modifier = Modifier.width(Spacing.XS))
-            Text("Export Log Audit Trail ke PDF")
-        }
+            fullWidth = true,
+        )
 
         uiState.reportContent?.tableRows?.forEach { row ->
             AppCard {

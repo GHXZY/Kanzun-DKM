@@ -1,5 +1,6 @@
 package com.kanzun.perbendaharaan.feature.reports.presentation.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -25,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
@@ -135,15 +138,17 @@ fun CashFlowAreaChart(
                         val canvasWidth = size.width
                         val canvasHeight = size.height
 
-                        // Grid lines
+                        // Grid lines (Dashed Hairline)
                         val steps = 3
+                        val dashEffect = PathEffect.dashPathEffect(floatArrayOf(6f, 6f), 0f)
                         for (i in 0..steps) {
                             val y = canvasHeight * (1f - i.toFloat() / steps)
                             drawLine(
                                 color = gridLineColor,
                                 start = Offset(0f, y),
                                 end = Offset(canvasWidth, y),
-                                strokeWidth = 1.dp.toPx(),
+                                strokeWidth = 0.5.dp.toPx(),
+                                pathEffect = dashEffect,
                             )
                         }
 
@@ -171,13 +176,13 @@ fun CashFlowAreaChart(
                         // Draw Income Area Fill
                         drawPath(
                             path = incomeFillPath,
-                            color = primaryColor.copy(alpha = 0.15f),
+                            color = primaryColor.copy(alpha = 0.12f),
                         )
                         // Draw Income Stroke Line
                         drawPath(
                             path = incomePath,
                             color = primaryColor,
-                            style = Stroke(width = 3.dp.toPx()),
+                            style = Stroke(width = 2.dp.toPx()),
                         )
 
                         // Expense Path & Area Fill
@@ -202,13 +207,13 @@ fun CashFlowAreaChart(
                         // Draw Expense Area Fill
                         drawPath(
                             path = expenseFillPath,
-                            color = accentColor.copy(alpha = 0.20f),
+                            color = accentColor.copy(alpha = 0.14f),
                         )
                         // Draw Expense Stroke Line
                         drawPath(
                             path = expensePath,
                             color = accentColor,
-                            style = Stroke(width = 3.dp.toPx()),
+                            style = Stroke(width = 2.dp.toPx()),
                         )
 
                         // Draw selected point indicator line
@@ -254,8 +259,9 @@ fun CashFlowAreaChart(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(top = Spacing.XS),
-                            shape = KanzunShapes.Card,
-                            color = MaterialTheme.colorScheme.surfaceVariant,
+                            shape = RoundedCornerShape(4.dp),
+                            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
                         ) {
                             Column(
                                 modifier = Modifier.padding(Spacing.MD),
@@ -264,31 +270,42 @@ fun CashFlowAreaChart(
                                 Text(
                                     text = "Periode: ${point.dateLabel}",
                                     style = MaterialTheme.typography.titleSmall,
-                                    fontWeight = FontWeight.Bold,
+                                    fontWeight = FontWeight.Normal,
                                 )
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                 ) {
                                     Text("Pemasukan:", style = MaterialTheme.typography.bodySmall, color = primaryColor)
-                                    Text(Money(point.incomeInCents).formatted, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold)
+                                    Text(
+                                        Money(point.incomeInCents).formatted,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        fontWeight = FontWeight.Normal,
+                                        letterSpacing = (-0.2).sp,
+                                    )
                                 }
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                 ) {
                                     Text("Pengeluaran:", style = MaterialTheme.typography.bodySmall, color = accentColor)
-                                    Text(Money(point.expenseInCents).formatted, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold)
+                                    Text(
+                                        Money(point.expenseInCents).formatted,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        fontWeight = FontWeight.Normal,
+                                        letterSpacing = (-0.2).sp,
+                                    )
                                 }
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                 ) {
-                                    Text("Arus Kas Bersih (Net):", style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold)
+                                    Text("Arus Kas Bersih (Net):", style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Normal)
                                     Text(
                                         text = Money(point.netInCents).formatted,
                                         style = MaterialTheme.typography.bodySmall,
-                                        fontWeight = FontWeight.Bold,
+                                        fontWeight = FontWeight.Normal,
+                                        letterSpacing = (-0.2).sp,
                                         color = if (point.netInCents >= 0) primaryColor else MaterialTheme.colorScheme.error,
                                     )
                                 }
@@ -313,8 +330,8 @@ private fun ChartLegendItem(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Surface(
-            modifier = Modifier.size(10.dp),
-            shape = KanzunShapes.Pill,
+            modifier = Modifier.size(8.dp),
+            shape = RoundedCornerShape(2.dp),
             color = color,
         ) {}
         Text(

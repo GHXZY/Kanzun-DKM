@@ -218,7 +218,7 @@ fun CashFlowScreen(
                                         Text(
                                             text = dateHeader,
                                             style = MaterialTheme.typography.labelLarge.copy(
-                                                fontWeight = FontWeight.Bold,
+                                                fontWeight = FontWeight.SemiBold,
                                                 fontSize = 13.sp,
                                             ),
                                             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -400,7 +400,7 @@ private fun VerticalFabMenuItem(
             Text(
                 text = label,
                 style = MaterialTheme.typography.labelMedium.copy(
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.SemiBold,
                     fontSize = 13.sp,
                 ),
                 color = MaterialTheme.colorScheme.onSurface,
@@ -409,18 +409,19 @@ private fun VerticalFabMenuItem(
         }
 
         Surface(
-            shape = KanzunShapes.Pill,
+            shape = KanzunShapes.SmallComponent,
             color = MaterialTheme.colorScheme.surface,
             tonalElevation = 0.dp,
-            shadowElevation = 4.dp,
-            modifier = Modifier.size(48.dp),
+            shadowElevation = 1.dp,
+            border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+            modifier = Modifier.size(42.dp),
         ) {
             Box(contentAlignment = Alignment.Center) {
                 Icon(
                     imageVector = icon,
                     contentDescription = label,
                     tint = iconTint,
-                    modifier = Modifier.size(22.dp),
+                    modifier = Modifier.size(20.dp),
                 )
             }
         }
@@ -467,7 +468,7 @@ private fun TransactionCardItem(
         onClick = onClick,
         modifier = modifier
             .fillMaxWidth()
-            .heightIn(min = 68.dp),
+            .heightIn(min = 64.dp),
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -479,16 +480,17 @@ private fun TransactionCardItem(
                 modifier = Modifier.weight(1f),
             ) {
                 Surface(
-                    shape = KanzunShapes.Pill,
+                    shape = KanzunShapes.SmallComponent,
                     color = iconBgColor,
-                    modifier = Modifier.size(42.dp),
+                    border = androidx.compose.foundation.BorderStroke(0.5.dp, iconColor.copy(alpha = 0.25f)),
+                    modifier = Modifier.size(36.dp),
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Icon(
                             imageVector = icon,
                             contentDescription = null,
                             tint = iconColor,
-                            modifier = Modifier.size(22.dp),
+                            modifier = Modifier.size(18.dp),
                         )
                     }
                 }
@@ -498,9 +500,8 @@ private fun TransactionCardItem(
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = transaction.title,
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            fontSize = 15.sp,
-                            fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.titleSmall.copy(
+                            fontWeight = FontWeight.Normal,
                         ),
                         color = MaterialTheme.colorScheme.onSurface,
                         maxLines = 1,
@@ -509,7 +510,9 @@ private fun TransactionCardItem(
 
                     Text(
                         text = categoryDisplay,
-                        style = MaterialTheme.typography.bodySmall,
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            fontWeight = FontWeight.Normal,
+                        ),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
@@ -522,8 +525,8 @@ private fun TransactionCardItem(
             Text(
                 text = "$amountPrefix${Money.of(transaction.amountInCents).formatRupiah()}",
                 style = MaterialTheme.typography.titleMedium.copy(
-                    fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
+                    letterSpacing = (-0.2).sp,
                 ),
                 color = amountColor,
                 maxLines = 1,
@@ -592,7 +595,7 @@ private fun TransactionFormDialog(
                         text = dialogTitle,
                         style = MaterialTheme.typography.titleLarge.copy(
                             fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
+                            fontWeight = FontWeight.SemiBold,
                         ),
                         color = MaterialTheme.colorScheme.onSurface,
                     )
@@ -952,7 +955,7 @@ private fun TransactionDetailDialog(
                         text = "Detail Transaksi",
                         style = MaterialTheme.typography.titleLarge.copy(
                             fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
+                            fontWeight = FontWeight.SemiBold,
                         ),
                     )
                     IconButton(
@@ -975,7 +978,7 @@ private fun TransactionDetailDialog(
                 ) {
                     DetailRow("Judul Transaksi", transaction.title)
                     DetailRow("Jenis Transaksi", transaction.type.name)
-                    DetailRow("Nominal Kas", Money.of(transaction.amountInCents).formatRupiah())
+                    DetailRow("Nominal Kas", Money.of(transaction.amountInCents).formatRupiah(), isEmphasized = true)
                     DetailRow("Waktu Pencatatan", formattedDate)
                     DetailRow("Rekening / Kas", transaction.accountId.formatAccountName())
                     DetailRow("Peruntukan Dana", transaction.fundId)
@@ -1031,7 +1034,7 @@ private fun TransactionDetailDialog(
 }
 
 @Composable
-private fun DetailRow(label: String, value: String) {
+private fun DetailRow(label: String, value: String, isEmphasized: Boolean = false) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(Spacing.XS),
@@ -1044,7 +1047,7 @@ private fun DetailRow(label: String, value: String) {
         Text(
             text = value,
             style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.Bold,
+            fontWeight = if (isEmphasized) FontWeight.Bold else FontWeight.Normal,
             color = MaterialTheme.colorScheme.onSurface,
         )
     }

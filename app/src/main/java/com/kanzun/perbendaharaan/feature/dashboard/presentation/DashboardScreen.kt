@@ -1,19 +1,23 @@
 package com.kanzun.perbendaharaan.feature.dashboard.presentation
 
-import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalance
@@ -32,9 +36,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.kanzun.perbendaharaan.core.database.entity.TransactionEntity
 import com.kanzun.perbendaharaan.core.designsystem.KanzunShapes
@@ -42,20 +49,18 @@ import com.kanzun.perbendaharaan.core.designsystem.Spacing
 import com.kanzun.perbendaharaan.core.designsystem.components.AppCard
 import com.kanzun.perbendaharaan.core.designsystem.components.EmptyState
 import com.kanzun.perbendaharaan.core.designsystem.components.ErrorState
-import com.kanzun.perbendaharaan.core.designsystem.components.HeroCard
 import com.kanzun.perbendaharaan.core.designsystem.components.KpiCard
 import com.kanzun.perbendaharaan.core.designsystem.components.LoadingState
 import com.kanzun.perbendaharaan.core.designsystem.components.PrimaryButton
 import com.kanzun.perbendaharaan.core.designsystem.components.ProgressCard
 import com.kanzun.perbendaharaan.core.designsystem.components.SectionHeader
+import com.kanzun.perbendaharaan.core.model.CashBreakdown
 import com.kanzun.perbendaharaan.core.model.Money
 import com.kanzun.perbendaharaan.core.model.TransactionType
 import com.kanzun.perbendaharaan.feature.dashboard.presentation.components.FundAllocationPieChart
-import com.kanzun.perbendaharaan.feature.dashboard.presentation.components.RekeningVsCashChart
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-
 
 import com.kanzun.perbendaharaan.core.util.formatCategoryName
 import com.kanzun.perbendaharaan.core.designsystem.components.ResponsiveContentContainer
@@ -102,20 +107,11 @@ fun DashboardScreen(
                         onActionClick = { onNavigateToFeature("cash_flow") },
                     )
                 } else {
-                    // Calculate percentage breakdown safely
-                    val totalCents = state.cashBreakdown.totalCash.amountInCents
-                    val bankPct = if (totalCents > 0) (state.cashBreakdown.bankTotal.amountInCents * 100 / totalCents) else 0L
-                    val cashPct = if (totalCents > 0) (state.cashBreakdown.cashTotal.amountInCents * 100 / totalCents) else 0L
-
-                    // 2. TOTAL KAS (Hero Card)
-                    HeroCard(
-                        title = "Total Kas",
-                        amountText = state.totalCash.formatRupiah(),
-                    )
-
-                    // 3. REKENING VS CASH (Pie / Donut Chart)
-                    RekeningVsCashChart(
-                        breakdown = state.cashBreakdown,
+                    // 2. TOTAL KAS (Styled card with Rekening vs Cash progress indicator)
+                    TotalKasCard(
+                        totalCash = state.totalCash,
+                        cashBreakdown = state.cashBreakdown,
+                        monthlyChange = state.monthlyChange,
                         onCardClick = { onNavigateToFeature("cash_flow") },
                     )
 
@@ -272,16 +268,17 @@ private fun TransactionItemRow(
                 modifier = Modifier.weight(1f),
             ) {
                 Surface(
-                    shape = KanzunShapes.Pill,
+                    shape = KanzunShapes.SmallComponent,
                     color = iconBgColor,
-                    modifier = Modifier.size(40.dp),
+                    border = androidx.compose.foundation.BorderStroke(0.5.dp, iconColor.copy(alpha = 0.25f)),
+                    modifier = Modifier.size(36.dp),
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Icon(
                             imageVector = icon,
                             contentDescription = null,
                             tint = iconColor,
-                            modifier = Modifier.size(20.dp),
+                            modifier = Modifier.size(18.dp),
                         )
                     }
                 }
@@ -291,13 +288,16 @@ private fun TransactionItemRow(
                 Column {
                     Text(
                         text = transaction.title,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.titleSmall.copy(
+                            fontWeight = FontWeight.Normal,
+                        ),
                         color = MaterialTheme.colorScheme.onSurface,
                     )
                     Text(
                         text = "${transaction.categoryId.formatCategoryName()} \u2022 $formattedDate",
-                        style = MaterialTheme.typography.bodySmall,
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            fontWeight = FontWeight.Normal,
+                        ),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
@@ -305,10 +305,200 @@ private fun TransactionItemRow(
 
             Text(
                 text = "$amountPrefix${Money.of(transaction.amountInCents).formatRupiah()}",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = (-0.2).sp,
+                ),
                 color = amountColor,
             )
+        }
+    }
+}
+
+@Composable
+private fun TotalKasCard(
+    totalCash: Money,
+    cashBreakdown: CashBreakdown,
+    monthlyChange: Money,
+    modifier: Modifier = Modifier,
+    onCardClick: (() -> Unit)? = null,
+) {
+    val totalCents = totalCash.amountInCents
+    val netChangeCents = monthlyChange.amountInCents
+    val prevBalanceCents = totalCents - netChangeCents
+
+    val (pctText, isPositive) = when {
+        prevBalanceCents > 0 -> {
+            val pct = (netChangeCents.toDouble() / prevBalanceCents.toDouble()) * 100.0
+            val sign = if (pct >= 0) "+" else ""
+            Pair("$sign${String.format(Locale.US, "%.1f", pct)}%", pct >= 0)
+        }
+        prevBalanceCents == 0L && totalCents > 0 -> Pair("+100.0%", true)
+        netChangeCents > 0 -> Pair("+100.0%", true)
+        netChangeCents < 0 -> Pair("-100.0%", false)
+        else -> Pair("+0.0%", true)
+    }
+
+    val totalBreakdownCents = cashBreakdown.totalCash.amountInCents
+    val bankCents = cashBreakdown.bankTotal.amountInCents
+    val bankPct = if (totalBreakdownCents > 0) {
+        (bankCents * 100 / totalBreakdownCents).toInt()
+    } else 0
+    val progressFraction = (bankPct / 100f).coerceIn(0f, 1f)
+
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .then(if (onCardClick != null) Modifier.clickable(onClick = onCardClick) else Modifier),
+        shape = RoundedCornerShape(8.dp),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+        shadowElevation = 1.dp,
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(Spacing.LG),
+        ) {
+            // Top Row: Icon Container on Left, Trend Badge on Right
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Top,
+            ) {
+                Surface(
+                    shape = RoundedCornerShape(8.dp),
+                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.45f),
+                    modifier = Modifier.size(48.dp),
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            imageVector = Icons.Default.Payments,
+                            contentDescription = "Total Kas Icon",
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(24.dp),
+                        )
+                    }
+                }
+
+                Column(horizontalAlignment = Alignment.End) {
+                    Surface(
+                        shape = RoundedCornerShape(6.dp),
+                        color = if (isPositive) Color(0xFFDCFCE7) else Color(0xFFFEE2E2),
+                    ) {
+                        Text(
+                            text = pctText,
+                            style = MaterialTheme.typography.labelMedium.copy(
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 13.sp,
+                            ),
+                            color = if (isPositive) Color(0xFF16A34A) else Color(0xFFDC2626),
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(4.dp))
+
+                    Text(
+                        text = "vs bulan lalu",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.75f),
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(Spacing.LG))
+
+            // Label: MONTHLY REVENUE -> TOTAL KAS
+            Text(
+                text = "TOTAL KAS",
+                style = MaterialTheme.typography.labelSmall.copy(
+                    fontWeight = FontWeight.SemiBold,
+                    letterSpacing = 1.sp,
+                ),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+
+            Spacer(modifier = Modifier.height(Spacing.XS))
+
+            // Big Amount: $12,480.00 -> Rp ...
+            Text(
+                text = totalCash.formatRupiah(),
+                style = MaterialTheme.typography.headlineLarge.copy(
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = (-0.64).sp,
+                ),
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+
+            Spacer(modifier = Modifier.height(Spacing.LG))
+
+            // Bottom Section: TARGET PROGRESS -> REKENING VS CASH
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = "REKENING VS CASH",
+                    style = MaterialTheme.typography.labelSmall.copy(
+                        fontWeight = FontWeight.SemiBold,
+                        letterSpacing = 0.8.sp,
+                    ),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+
+                Text(
+                    text = "$bankPct%",
+                    style = MaterialTheme.typography.labelSmall.copy(
+                        fontWeight = FontWeight.Bold,
+                    ),
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+            }
+
+            Spacer(modifier = Modifier.height(Spacing.XS + 2.dp))
+
+            // Progress Bar
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(8.dp)
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.35f)),
+            ) {
+                if (progressFraction > 0f) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(fraction = progressFraction)
+                            .fillMaxHeight()
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(MaterialTheme.colorScheme.primary),
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(Spacing.XS + 2.dp))
+
+            // Detail amounts under progress bar
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = "Rekening: ${cashBreakdown.bankTotal.formatRupiah()}",
+                    style = MaterialTheme.typography.labelSmall.copy(fontSize = 11.sp),
+                    fontWeight = FontWeight.Normal,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+                Text(
+                    text = "Kas Tunai: ${cashBreakdown.cashTotal.formatRupiah()}",
+                    style = MaterialTheme.typography.labelSmall.copy(fontSize = 11.sp),
+                    fontWeight = FontWeight.Normal,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
         }
     }
 }

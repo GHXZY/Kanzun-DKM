@@ -1,8 +1,10 @@
 package com.kanzun.perbendaharaan.core.designsystem.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.text.font.FontWeight
 import com.kanzun.perbendaharaan.core.designsystem.neomorphic
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -24,6 +26,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.kanzun.perbendaharaan.core.designsystem.IconSize
 import com.kanzun.perbendaharaan.core.designsystem.KanzunShapes
 import com.kanzun.perbendaharaan.core.designsystem.Spacing
@@ -51,13 +54,14 @@ fun StatusChip(
         ChipStatusType.NEUTRAL -> MaterialTheme.colorScheme.surfaceVariant to MaterialTheme.colorScheme.onSurfaceVariant
     }
 
-    Box(
-        modifier = modifier
-            .clip(KanzunShapes.Pill)
-            .background(backgroundColor)
-            .padding(horizontal = Spacing.MD, vertical = Spacing.XS + 2.dp),
+    Surface(
+        shape = KanzunShapes.SmallComponent,
+        color = backgroundColor,
+        border = BorderStroke(0.5.dp, textColor.copy(alpha = 0.25f)),
+        modifier = modifier,
     ) {
         Row(
+            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             if (icon != null) {
@@ -71,7 +75,10 @@ fun StatusChip(
             }
             Text(
                 text = text,
-                style = MaterialTheme.typography.labelMedium,
+                style = MaterialTheme.typography.labelSmall.copy(
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Normal,
+                ),
                 color = textColor,
             )
         }
@@ -89,7 +96,7 @@ fun FilterChip(
     val backgroundColor = if (selected) {
         MaterialTheme.colorScheme.primary
     } else {
-        MaterialTheme.colorScheme.surfaceVariant
+        MaterialTheme.colorScheme.surface
     }
 
     val textColor = if (selected) {
@@ -98,15 +105,23 @@ fun FilterChip(
         MaterialTheme.colorScheme.onSurfaceVariant
     }
 
+    val borderColor = if (selected) {
+        MaterialTheme.colorScheme.primary
+    } else {
+        MaterialTheme.colorScheme.outlineVariant
+    }
+
     Surface(
         onClick = onClick,
-        modifier = modifier.heightIn(min = 48.dp).semantics { this.selected = selected }.neomorphic(KanzunShapes.Pill, inset = selected),
-        shape = KanzunShapes.Pill,
+        modifier = modifier.heightIn(min = 36.dp).semantics { this.selected = selected },
+        shape = KanzunShapes.SmallComponent,
         color = backgroundColor,
         contentColor = textColor,
+        border = BorderStroke(1.dp, borderColor),
+        shadowElevation = if (selected) 1.dp else 0.dp,
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = Spacing.MD, vertical = Spacing.SM + 2.dp),
+            modifier = Modifier.padding(horizontal = Spacing.MDS, vertical = Spacing.XS + 2.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             if (icon != null) {
@@ -119,7 +134,10 @@ fun FilterChip(
             }
             Text(
                 text = text,
-                style = MaterialTheme.typography.labelLarge,
+                style = MaterialTheme.typography.labelMedium.copy(
+                    fontSize = 13.sp,
+                    fontWeight = if (selected) FontWeight.Normal else FontWeight.Light,
+                ),
             )
         }
     }

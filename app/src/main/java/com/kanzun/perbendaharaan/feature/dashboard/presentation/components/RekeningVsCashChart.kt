@@ -1,8 +1,11 @@
 package com.kanzun.perbendaharaan.feature.dashboard.presentation.components
 
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -112,12 +115,23 @@ fun RekeningVsCashChart(
                                     }
                                 },
                         ) {
-                            val strokeWidth = 24.dp.toPx()
+                            val strokeWidth = 18.dp.toPx()
                             val chartSize = size.width - strokeWidth
                             val topLeft = Offset(strokeWidth / 2f, strokeWidth / 2f)
 
                             val bankSweep = (bankPct / 100f) * 360f
                             val cashSweep = 360f - bankSweep
+
+                            // Background subtle guide track
+                            drawArc(
+                                color = Color(0xFFF1F5F9),
+                                startAngle = 0f,
+                                sweepAngle = 360f,
+                                useCenter = false,
+                                topLeft = topLeft,
+                                size = Size(chartSize, chartSize),
+                                style = Stroke(width = strokeWidth),
+                            )
 
                             // Draw Bank Arc
                             if (bankSweep > 0f) {
@@ -128,7 +142,7 @@ fun RekeningVsCashChart(
                                     useCenter = false,
                                     topLeft = topLeft,
                                     size = Size(chartSize, chartSize),
-                                    style = Stroke(width = if (selectedSegment == "Bank") strokeWidth + 6.dp.toPx() else strokeWidth),
+                                    style = Stroke(width = if (selectedSegment == "Bank") strokeWidth + 4.dp.toPx() else strokeWidth),
                                 )
                             }
 
@@ -141,7 +155,7 @@ fun RekeningVsCashChart(
                                     useCenter = false,
                                     topLeft = topLeft,
                                     size = Size(chartSize, chartSize),
-                                    style = Stroke(width = if (selectedSegment == "Cash") strokeWidth + 6.dp.toPx() else strokeWidth),
+                                    style = Stroke(width = if (selectedSegment == "Cash") strokeWidth + 4.dp.toPx() else strokeWidth),
                                 )
                             }
                         }
@@ -152,14 +166,21 @@ fun RekeningVsCashChart(
                             verticalArrangement = Arrangement.Center,
                         ) {
                             Text(
-                                text = "Total Kas",
-                                style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp),
+                                text = "TOTAL KAS",
+                                style = MaterialTheme.typography.labelSmall.copy(
+                                    fontSize = 9.sp,
+                                    fontWeight = FontWeight.Normal,
+                                    letterSpacing = 0.6.sp,
+                                ),
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
+                            Spacer(modifier = Modifier.height(2.dp))
                             Text(
                                 text = formatShortRupiah(totalCents),
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
+                                style = MaterialTheme.typography.titleMedium.copy(
+                                    fontWeight = FontWeight.Light,
+                                    letterSpacing = (-0.3).sp,
+                                ),
                                 color = MaterialTheme.colorScheme.onSurface,
                             )
                         }
@@ -203,9 +224,10 @@ fun RekeningVsCashChart(
                     Surface(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(top = Spacing.SM),
+                            .padding(top = Spacing.XS),
                         shape = KanzunShapes.Card,
-                        color = MaterialTheme.colorScheme.surfaceVariant,
+                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
                     ) {
                         Row(
                             modifier = Modifier
@@ -215,10 +237,21 @@ fun RekeningVsCashChart(
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Column {
-                                Text(text = name, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
-                                Text(text = "$pct dari total kas masjid", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Text(
+                                    text = name,
+                                    style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Normal),
+                                )
+                                Text(
+                                    text = "$pct dari total kas masjid",
+                                    style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Light),
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
                             }
-                            Text(text = amount, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                            Text(
+                                text = amount,
+                                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Light),
+                                color = MaterialTheme.colorScheme.primary,
+                            )
                         }
                     }
                 }
@@ -238,38 +271,49 @@ private fun LegendRow(
     modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(KanzunShapes.SmallComponent)
+            .clickable { onClick() }
+            .padding(vertical = 4.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
             Surface(
-                modifier = Modifier.size(10.dp),
-                shape = KanzunShapes.Pill,
+                modifier = Modifier.size(8.dp),
+                shape = KanzunShapes.SmallComponent,
                 color = color,
             ) {}
-            Spacer(modifier = Modifier.width(Spacing.XS))
+            Spacer(modifier = Modifier.width(Spacing.SM))
             Column {
                 Text(
                     text = label,
-                    style = MaterialTheme.typography.bodySmall,
-                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                    color = MaterialTheme.colorScheme.onSurface,
+                    style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Light),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Text(
                     text = amountText,
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Normal),
                     color = MaterialTheme.colorScheme.onSurface,
                 )
             }
         }
-        Text(
-            text = percentageText,
-            style = MaterialTheme.typography.labelSmall,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
+        Surface(
+            shape = KanzunShapes.SmallComponent,
+            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+        ) {
+            Text(
+                text = percentageText,
+                style = MaterialTheme.typography.labelSmall.copy(
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Normal,
+                ),
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+            )
+        }
     }
 }
 

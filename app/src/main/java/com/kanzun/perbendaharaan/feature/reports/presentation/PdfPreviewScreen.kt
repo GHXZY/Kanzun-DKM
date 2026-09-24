@@ -46,7 +46,10 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.kanzun.perbendaharaan.core.designsystem.KanzunShapes
 import com.kanzun.perbendaharaan.core.designsystem.Spacing
@@ -81,8 +84,9 @@ fun PdfPreviewScreen(
         bottomBar = {
             Surface(
                 modifier = Modifier.fillMaxWidth(),
-                tonalElevation = 8.dp,
-                shadowElevation = 8.dp,
+                tonalElevation = 0.dp,
+                shadowElevation = 1.dp,
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
                 color = MaterialTheme.colorScheme.surface,
             ) {
                 Box(
@@ -164,10 +168,10 @@ private fun FullSuratLaporanDocument(
 
     Surface(
         modifier = modifier.fillMaxWidth(),
-        shape = KanzunShapes.Card,
+        shape = RoundedCornerShape(8.dp),
         color = Color.White,
-        shadowElevation = 4.dp,
-        border = BorderStroke(1.dp, Color(0xFFCBD5E1)),
+        shadowElevation = 1.dp,
+        border = BorderStroke(1.dp, Color(0xFFE5EDF5)),
     ) {
         Column(
             modifier = Modifier
@@ -185,13 +189,16 @@ private fun FullSuratLaporanDocument(
                     Image(
                         bitmap = logoBitmap,
                         contentDescription = "Logo Masjid",
-                        modifier = Modifier.size(56.dp),
+                        modifier = Modifier
+                            .size(56.dp)
+                            .clip(RoundedCornerShape(4.dp)),
                     )
                 } else {
                     Surface(
                         modifier = Modifier.size(56.dp),
-                        shape = KanzunShapes.Pill,
-                        color = Color(0xFFF1F5F9),
+                        shape = RoundedCornerShape(4.dp),
+                        color = Color(0xFFF8FAFC),
+                        border = BorderStroke(1.dp, Color(0xFFE5EDF5)),
                     ) {
                         Box(contentAlignment = Alignment.Center) {
                             Icon(
@@ -208,17 +215,20 @@ private fun FullSuratLaporanDocument(
                     Text(
                         text = reportContent.mosqueName,
                         style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.SemiBold,
+                        letterSpacing = (-0.4).sp,
                         color = Color(0xFF0F172A),
                     )
                     Text(
                         text = reportContent.mosqueAddress,
                         style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Normal,
                         color = Color(0xFF475569),
                     )
                     Text(
                         text = "Telp: ${reportContent.mosquePhone} \u2022 Email: ${reportContent.mosqueEmail}",
                         style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Normal,
                         color = Color(0xFF64748B),
                     )
                 }
@@ -228,7 +238,7 @@ private fun FullSuratLaporanDocument(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(3.dp)
+                    .height(1.dp)
                     .background(Color(0xFF0F172A)),
             )
 
@@ -238,7 +248,8 @@ private fun FullSuratLaporanDocument(
             Text(
                 text = "SURAT LAPORAN ${reportContent.reportType.title.uppercase()}",
                 style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
+                fontWeight = FontWeight.SemiBold,
+                letterSpacing = (-0.2).sp,
                 color = Color(0xFF0F172A),
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center,
@@ -246,6 +257,7 @@ private fun FullSuratLaporanDocument(
             Text(
                 text = "Periode: ${reportContent.periodLabel}",
                 style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Normal,
                 color = Color(0xFF475569),
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center,
@@ -256,9 +268,9 @@ private fun FullSuratLaporanDocument(
             // 3. RINGKASAN KEUANGAN SURAT
             if (reportContent.summaries.isNotEmpty()) {
                 Surface(
-                    shape = KanzunShapes.Card,
+                    shape = RoundedCornerShape(4.dp),
                     color = Color(0xFFF8FAFC),
-                    border = BorderStroke(1.dp, Color(0xFFE2E8F0)),
+                    border = BorderStroke(1.dp, Color(0xFFE5EDF5)),
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Column(
@@ -268,7 +280,8 @@ private fun FullSuratLaporanDocument(
                         Text(
                             text = "Ringkasan Eksekutif",
                             style = MaterialTheme.typography.titleSmall,
-                            fontWeight = FontWeight.Bold,
+                            fontWeight = FontWeight.SemiBold,
+                            letterSpacing = (-0.2).sp,
                             color = Color(0xFF0F172A),
                         )
                         reportContent.summaries.forEach { item ->
@@ -285,6 +298,7 @@ private fun FullSuratLaporanDocument(
                                     text = item.value,
                                     style = MaterialTheme.typography.bodyMedium,
                                     fontWeight = FontWeight.Bold,
+                                    letterSpacing = (-0.2).sp,
                                     color = Color(0xFF0F172A),
                                 )
                             }
@@ -298,20 +312,21 @@ private fun FullSuratLaporanDocument(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .border(1.dp, Color(0xFFCBD5E1)),
+                        .clip(RoundedCornerShape(4.dp))
+                        .border(1.dp, Color(0xFFE5EDF5), RoundedCornerShape(4.dp)),
                 ) {
                     // Header Bar
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(Color(0xFF1E293B))
+                            .background(Color(0xFF0F172A))
                             .padding(vertical = 8.dp, horizontal = 8.dp),
                     ) {
                         reportContent.tableHeaders.forEach { header ->
                             Text(
                                 text = header,
                                 style = MaterialTheme.typography.bodySmall,
-                                fontWeight = FontWeight.Bold,
+                                fontWeight = FontWeight.SemiBold,
                                 color = Color.White,
                                 modifier = Modifier.weight(1f),
                                 maxLines = 1,
@@ -333,6 +348,8 @@ private fun FullSuratLaporanDocument(
                                 Text(
                                     text = text,
                                     style = MaterialTheme.typography.bodySmall,
+                                    fontWeight = FontWeight.Normal,
+                                    letterSpacing = (-0.2).sp,
                                     color = Color(0xFF334155),
                                     modifier = Modifier.weight(1f),
                                     maxLines = 2,
@@ -381,7 +398,7 @@ private fun FullSuratLaporanDocument(
                     Text(
                         text = reportContent.chairmanName.ifBlank { "H. Ahmad Dahlan" },
                         style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.Normal,
                         color = Color(0xFF0F172A),
                     )
                 }
@@ -396,7 +413,7 @@ private fun FullSuratLaporanDocument(
                     Text(
                         text = reportContent.treasurerName.ifBlank { "H. Muhammad Hatta" },
                         style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.Normal,
                         color = Color(0xFF0F172A),
                     )
                 }

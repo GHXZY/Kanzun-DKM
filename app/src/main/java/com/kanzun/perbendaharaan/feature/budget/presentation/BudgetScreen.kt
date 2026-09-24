@@ -6,6 +6,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -185,11 +186,11 @@ private fun BudgetListView(
         // SEARCH BAR
         OutlinedTextField(
             value = uiState.searchQuery,
-            onValueChange = onSearchChange,
+            onSearchChange,
             placeholder = { Text("Cari RAPBM...") },
             leadingIcon = { Icon(imageVector = Icons.Default.Search, contentDescription = "Cari") },
             singleLine = true,
-            shape = RoundedCornerShape(12.dp),
+            shape = RoundedCornerShape(4.dp),
             modifier = Modifier
                 .fillMaxWidth()
                 .heightIn(min = 50.dp),
@@ -253,7 +254,7 @@ private fun BudgetCardItem(
                 Text(
                     text = budget.title,
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.SemiBold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f),
@@ -284,6 +285,7 @@ private fun BudgetCardItem(
                     text = Money.of(budget.totalIncomeBudgetInCents).formatRupiah(),
                     style = MaterialTheme.typography.bodySmall,
                     fontWeight = FontWeight.Bold,
+                    letterSpacing = (-0.2).sp,
                     color = PrimaryBlue,
                 )
             }
@@ -302,6 +304,7 @@ private fun BudgetCardItem(
                     text = Money.of(budget.totalExpenseBudgetInCents).formatRupiah(),
                     style = MaterialTheme.typography.bodySmall,
                     fontWeight = FontWeight.Bold,
+                    letterSpacing = (-0.2).sp,
                     color = AccentAmber,
                 )
             }
@@ -340,7 +343,7 @@ private fun BudgetDetailView(
                 Text(
                     text = budget.title,
                     style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.SemiBold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -358,7 +361,7 @@ private fun BudgetDetailView(
                 Text(
                     text = "Ringkasan Anggaran",
                     style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.SemiBold,
                 )
 
                 // PEMASUKAN SUMMARY
@@ -378,8 +381,9 @@ private fun BudgetDetailView(
                 )
 
                 Surface(
-                    shape = RoundedCornerShape(8.dp),
-                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                    shape = RoundedCornerShape(4.dp),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)),
+                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Row(
@@ -394,6 +398,7 @@ private fun BudgetDetailView(
                             text = Money.of(uiState.netActualBalanceInCents).formatRupiah(),
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Bold,
+                            letterSpacing = (-0.3).sp,
                             color = if (uiState.netActualBalanceInCents >= 0) SecondaryGreen else MaterialTheme.colorScheme.error,
                         )
                     }
@@ -412,7 +417,7 @@ private fun BudgetDetailView(
         Text(
             text = "Pemasukan (Rancangan vs Realita)",
             style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
+            fontWeight = FontWeight.SemiBold,
         )
 
         if (uiState.detailIncomeItems.isEmpty()) {
@@ -429,7 +434,7 @@ private fun BudgetDetailView(
         Text(
             text = "Pengeluaran (Rancangan vs Realita)",
             style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
+            fontWeight = FontWeight.SemiBold,
         )
 
         if (uiState.detailExpenseItems.isEmpty()) {
@@ -472,27 +477,61 @@ private fun SummaryRowDual(
     actualText: String,
     diffText: String,
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(8.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
-            .padding(10.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp),
+    Surface(
+        shape = RoundedCornerShape(4.dp),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
+        modifier = Modifier.fillMaxWidth(),
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(10.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
-            Text(text = label, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
-            Text(text = "Selisih: $diffText", style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.SemiBold)
-        }
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-            Text(text = "Rancangan: $plannedText", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Text(text = "Realita: $actualText", style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold, color = PrimaryBlue)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Text(text = label, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
+                Row {
+                    Text(text = "Selisih: ", style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Normal, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(text = diffText, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold)
+                }
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Row {
+                    Text(
+                        text = "Rancangan: ",
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Normal,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Text(
+                        text = plannedText,
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                Row {
+                    Text(
+                        text = "Realita: ",
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Normal,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Text(
+                        text = actualText,
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Bold,
+                        color = PrimaryBlue,
+                    )
+                }
+            }
         }
     }
 }
@@ -518,7 +557,7 @@ private fun CategoryComparisonRow(
                 Text(
                     text = item.categoryName.formatCategoryName(),
                     style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.Normal,
                 )
                 Text(
                     text = formatDiff(diffCents, isIncome),
@@ -532,17 +571,34 @@ private fun CategoryComparisonRow(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
-                Text(
-                    text = "Rancangan: ${Money.of(item.plannedAmountInCents).formatRupiah()}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                Text(
-                    text = "Realita: ${Money.of(item.actualAmountInCents).formatRupiah()}",
-                    style = MaterialTheme.typography.bodySmall,
-                    fontWeight = FontWeight.SemiBold,
-                    color = PrimaryBlue,
-                )
+                Row {
+                    Text(
+                        text = "Rancangan: ",
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Normal,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Text(
+                        text = Money.of(item.plannedAmountInCents).formatRupiah(),
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                Row {
+                    Text(
+                        text = "Realita: ",
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Normal,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Text(
+                        text = Money.of(item.actualAmountInCents).formatRupiah(),
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Bold,
+                        color = PrimaryBlue,
+                    )
+                }
             }
         }
     }

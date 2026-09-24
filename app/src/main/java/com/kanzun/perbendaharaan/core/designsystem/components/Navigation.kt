@@ -34,9 +34,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.ui.text.style.TextOverflow
@@ -73,18 +75,18 @@ fun FloatingNavBar(
             modifier = Modifier
                 .widthIn(max = 600.dp)
                 .fillMaxWidth()
-                .padding(horizontal = Spacing.MD, vertical = Spacing.MDS)
-                .heightIn(min = 72.dp)
-                .neomorphic(KanzunShapes.FloatingNavbar),
+                .padding(horizontal = Spacing.MD, vertical = Spacing.SM)
+                .height(60.dp),
             shape = KanzunShapes.FloatingNavbar,
             color = MaterialTheme.colorScheme.surface,
+            border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+            shadowElevation = 2.dp,
             tonalElevation = 0.dp,
-            shadowElevation = 0.dp,
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = Spacing.SM, vertical = Spacing.SM)
+                    .padding(horizontal = Spacing.SM, vertical = 4.dp)
                     .selectableGroup(),
                 horizontalArrangement = Arrangement.SpaceAround,
                 verticalAlignment = Alignment.CenterVertically,
@@ -94,11 +96,11 @@ fun FloatingNavBar(
 
                     val activeBackgroundColor by animateColorAsState(
                         targetValue = if (isSelected) {
-                            MaterialTheme.colorScheme.primaryContainer
+                            MaterialTheme.colorScheme.primary.copy(alpha = 0.08f)
                         } else {
-                            MaterialTheme.colorScheme.surface
+                            Color.Transparent
                         },
-                        animationSpec = tween(durationMillis = 200, easing = FastOutSlowInEasing),
+                        animationSpec = tween(durationMillis = 150, easing = FastOutSlowInEasing),
                         label = "NavBgAnimation",
                     )
 
@@ -108,42 +110,42 @@ fun FloatingNavBar(
                         } else {
                             MaterialTheme.colorScheme.onSurfaceVariant
                         },
-                        animationSpec = tween(durationMillis = 200, easing = FastOutSlowInEasing),
+                        animationSpec = tween(durationMillis = 150, easing = FastOutSlowInEasing),
                         label = "NavContentAnimation",
                     )
 
                     Box(
                         modifier = Modifier
                             .weight(1f)
-                            .sizeIn(minWidth = 48.dp, minHeight = 48.dp)
-                            .clip(KanzunShapes.Pill)
+                            .height(48.dp)
+                            .clip(KanzunShapes.SmallComponent)
                             .background(activeBackgroundColor)
                             .selectable(selected = isSelected, role = Role.Tab, onClick = { onItemSelected(item.route) })
-                            .padding(horizontal = Spacing.XS, vertical = Spacing.SM),
+                            .padding(horizontal = 4.dp, vertical = 4.dp),
                         contentAlignment = Alignment.Center,
                     ) {
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(4.dp),
+                            verticalArrangement = Arrangement.Center,
                         ) {
                             Icon(
                                 imageVector = item.icon,
                                 contentDescription = item.title,
                                 tint = activeContentColor,
-                                modifier = Modifier.size(IconSize.Standard),
+                                modifier = Modifier.size(20.dp),
                             )
-                            if (isSelected) {
-                                
-                                Text(
-                                    text = item.title,
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = activeContentColor,
-                                    fontWeight = FontWeight.Bold,
-                                    maxLines = 1,
-                                    softWrap = false,
-                                    overflow = TextOverflow.Ellipsis,
-                                )
-                            }
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Text(
+                                text = item.title,
+                                style = MaterialTheme.typography.labelSmall.copy(
+                                    fontSize = 11.sp,
+                                    fontWeight = if (isSelected) com.kanzun.perbendaharaan.core.designsystem.TypographyTokens.Medium else com.kanzun.perbendaharaan.core.designsystem.TypographyTokens.Regular,
+                                ),
+                                color = activeContentColor,
+                                maxLines = 1,
+                                softWrap = false,
+                                overflow = TextOverflow.Ellipsis,
+                            )
                         }
                     }
                 }

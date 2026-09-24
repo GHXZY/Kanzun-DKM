@@ -3,14 +3,17 @@ package com.kanzun.perbendaharaan.feature.settings.presentation
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kanzun.perbendaharaan.core.database.entity.AccountEntity
 import com.kanzun.perbendaharaan.core.database.entity.BackupMetadataEntity
 import com.kanzun.perbendaharaan.core.database.entity.MosqueEntity
 import com.kanzun.perbendaharaan.core.database.entity.MosqueLetterheadEntity
 import com.kanzun.perbendaharaan.core.database.entity.RoleEntity
 import com.kanzun.perbendaharaan.core.database.entity.SignatureEntity
 import com.kanzun.perbendaharaan.core.database.entity.UserEntity
+import com.kanzun.perbendaharaan.feature.financial.domain.repository.FinancialRepository
 import com.kanzun.perbendaharaan.feature.settings.domain.repository.SettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -35,11 +38,15 @@ enum class SettingsSection(val title: String) {
 data class SettingsUiState(
     val activeSection: SettingsSection = SettingsSection.PROFILE,
     val mosqueProfile: MosqueEntity? = null,
+    val isIdentityCustomized: Boolean = false,
     val letterhead: MosqueLetterheadEntity? = null,
     val signatures: List<SignatureEntity> = emptyList(),
     val users: List<UserEntity> = emptyList(),
     val roles: List<RoleEntity> = emptyList(),
     val backups: List<BackupMetadataEntity> = emptyList(),
+    val accounts: List<AccountEntity> = emptyList(),
+    val cashOpeningBalance: Long = 0L,
+    val bankOpeningBalance: Long = 0L,
     val securityPinEnabled: Boolean = false,
     val biometricEnabled: Boolean = true,
     val autoLockDurationMinutes: Int = 5,
@@ -60,6 +67,8 @@ data class SettingsUiState(
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val settingsRepository: SettingsRepository,
+    private val financialRepository: FinancialRepository,
+    @ApplicationContext private val context: Context,
 ) : ViewModel() {
 
     private val _activeSection = MutableStateFlow(SettingsSection.PROFILE)
@@ -72,6 +81,10 @@ class SettingsViewModel @Inject constructor(
     private val _showBackupConfirm = MutableStateFlow(false)
     private val _showRestoreConfirm = MutableStateFlow(false)
     private val _message = MutableStateFlow<String?>(null)
+    private val _isIdentityCustomized = MutableStateFlow(
+        context.getSharedPreferences("kanzun_app_prefs", Context.MODE_PRIVATE)
+            .getBoolean("is_mosque_identity_customized", false)
+    )
 
     val uiState: StateFlow<SettingsUiState> = combine(
         _activeSection,
@@ -86,6 +99,8 @@ class SettingsViewModel @Inject constructor(
         _showSetPinDialog,
         _showResetConfirmDialog,
         _pinCode,
+        financialRepository.getActiveAccounts(),
+        _isIdentityCustomized,
     ) { flows ->
         val section = flows[0] as SettingsSection
         val mosque = flows[1] as MosqueEntity?
@@ -103,9 +118,16 @@ class SettingsViewModel @Inject constructor(
         val showSetPin = flows[9] as Boolean
         val showResetConfirm = flows[10] as Boolean
         val pinVal = flows[11] as String
+        @Suppress("UNCHECKED_CAST")
+        val accounts = flows[12] as List<AccountEntity>
+        val isCustomized = flows[13] as Boolean
+
+        val cashOpening = accounts.find { it.id == "acc_cash" }?.openingBalanceInCents ?: 0L
+        val bankOpening = accounts.find { it.id == "acc_bsi" }?.openingBalanceInCents ?: 0L
 
         SettingsUiState(
             activeSection = section,
+            isIdentityCustomized = isCustomized,
             mosqueProfile = mosque ?: MosqueEntity(
                 id = "m_1",
                 name = "Masjid Agung Al-Mubarak",
@@ -135,6 +157,9 @@ class SettingsViewModel @Inject constructor(
                 )
             },
             backups = backups,
+            accounts = accounts,
+            cashOpeningBalance = cashOpening,
+            bankOpeningBalance = bankOpening,
             themePreference = theme,
             securityPinEnabled = pinEnabled,
             showSetPinDialog = showSetPin,
@@ -150,6 +175,14 @@ class SettingsViewModel @Inject constructor(
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = SettingsUiState(),
     )
+
+    fun saveOpeningBalances(cashBalanceCents: Long, bankBalanceCents: Long) {
+        viewModelScope.launch {
+            financialRepository.updateOpeningBalance("acc_cash", cashBalanceCents)
+            financialRepository.updateOpeningBalance("acc_bsi", bankBalanceCents)
+            _message.value = "Saldo awal berhasil disimpan"
+        }
+    }
 
     fun selectSection(section: SettingsSection) {
         _activeSection.value = section
@@ -180,6 +213,11 @@ class SettingsViewModel @Inject constructor(
             )
 
             settingsRepository.updateMosque(updated)
+            context.getSharedPreferences("kanzun_app_prefs", Context.MODE_PRIVATE)
+                .edit()
+                .putBoolean("is_mosque_identity_customized", true)
+                .apply()
+            _isIdentityCustomized.value = true
             _message.value = "Perubahan disimpan"
         }
     }
@@ -198,12 +236,18 @@ class SettingsViewModel @Inject constructor(
                     ?: MosqueEntity(id = "m_1", name = "Masjid Agung Al-Mubarak", address = "Jl. Ahmad Yani No. 45", logoPath = logoFile.absolutePath)
 
                 settingsRepository.updateMosque(updated)
+                context.getSharedPreferences("kanzun_app_prefs", Context.MODE_PRIVATE)
+                    .edit()
+                    .putBoolean("is_mosque_identity_customized", true)
+                    .apply()
+                _isIdentityCustomized.value = true
                 _message.value = "Logo berhasil diperbarui"
             } catch (e: Exception) {
                 _message.value = "Gagal menyimpan logo: ${e.localizedMessage}"
             }
         }
     }
+
 
     fun removeLogo() {
         viewModelScope.launch {
@@ -270,12 +314,37 @@ class SettingsViewModel @Inject constructor(
             try {
                 _showResetConfirmDialog.value = false
                 settingsRepository.resetData(context)
+                context.getSharedPreferences("kanzun_app_prefs", Context.MODE_PRIVATE)
+                    .edit()
+                    .putBoolean("is_mosque_identity_customized", false)
+                    .putBoolean("has_completed_initial_setup", false)
+                    .apply()
+                _isIdentityCustomized.value = false
                 _message.value = "Data Aplikasi Berhasil Direset ke Kondisi Awal"
             } catch (e: Exception) {
                 _message.value = "Gagal Mereset Data: ${e.localizedMessage}"
             }
         }
     }
+
+    fun saveInitialOpeningBalances(cashBalanceCents: Long, bankBalanceCents: Long) {
+        viewModelScope.launch {
+            financialRepository.updateOpeningBalance("acc_cash", cashBalanceCents)
+            financialRepository.updateOpeningBalance("acc_bsi", bankBalanceCents)
+            context.getSharedPreferences("kanzun_app_prefs", Context.MODE_PRIVATE)
+                .edit()
+                .putBoolean("has_completed_initial_setup", true)
+                .apply()
+        }
+    }
+
+    fun completeInitialSetup() {
+        context.getSharedPreferences("kanzun_app_prefs", Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean("has_completed_initial_setup", true)
+            .apply()
+    }
+
 
     fun toggleSecurityPin(context: Context, enabled: Boolean) {
         if (enabled) {
