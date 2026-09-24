@@ -121,7 +121,6 @@ fun DesignSystemPreviewScreen(
             title = "HERO CARD - TOTAL KAS",
             amountText = "Rp 125.450.000",
             subtitle = "Rekening: Rp 100jt \u2022 Cash: Rp 25.450rb",
-            badgeText = "Stabil",
         )
 
         KpiCard(

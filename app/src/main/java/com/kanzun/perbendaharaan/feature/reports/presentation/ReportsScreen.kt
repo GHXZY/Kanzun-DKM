@@ -76,7 +76,6 @@ import com.kanzun.perbendaharaan.core.designsystem.components.SegmentedControl
 import com.kanzun.perbendaharaan.core.designsystem.components.StatusChip
 import com.kanzun.perbendaharaan.core.model.Money
 import com.kanzun.perbendaharaan.core.model.TransactionType
-import com.kanzun.perbendaharaan.feature.dashboard.presentation.components.FundAllocationPieChart
 import com.kanzun.perbendaharaan.feature.dashboard.presentation.components.RekeningVsCashChart
 import com.kanzun.perbendaharaan.feature.reports.domain.model.ReportContent
 import com.kanzun.perbendaharaan.feature.reports.domain.model.ReportType
@@ -245,15 +244,6 @@ fun ReportsScreen(
                 onCardClick = {},
             )
 
-            // 6. ALOKASI DANA (Pie/Donut Chart)
-            SectionHeader(
-                title = "Alokasi Dana",
-            )
-
-            FundAllocationPieChart(
-                allocation = uiState.fundAllocation,
-                onCardClick = {},
-            )
 
             // 7. STATUS KEUANGAN
             SectionHeader(
@@ -368,7 +358,7 @@ fun ReportsScreen(
 
             // 10. EXPORT REPORT ACTION BUTTON (AT THE VERY BOTTOM)
             PrimaryButton(
-                text = if (uiState.isGeneratingPdf) "Membuat PDF..." else "Generate Surat Laporan (PDF)",
+                text = if (uiState.isGeneratingPdf) "Mengunduh PDF..." else "Download Laporan (PDF)",
                 icon = Icons.Default.PictureAsPdf,
                 onClick = { viewModel.openExportBottomSheet() },
                 fullWidth = true,
@@ -398,7 +388,7 @@ fun ReportsScreen(
                 verticalArrangement = Arrangement.spacedBy(Spacing.MD),
             ) {
                 Text(
-                    text = "Generate Surat Laporan",
+                    text = "Download Laporan",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                 )
@@ -566,7 +556,7 @@ fun ReportsScreen(
                 // ACTION BUTTONS
                 Column(verticalArrangement = Arrangement.spacedBy(Spacing.XS)) {
                     PrimaryButton(
-                        text = "Preview Surat (Laman Khusus)",
+                        text = "Preview Surat",
                         icon = Icons.Default.PictureAsPdf,
                         onClick = {
                             viewModel.preparePdfReportContent()
@@ -586,7 +576,7 @@ fun ReportsScreen(
                             modifier = Modifier.weight(1f),
                         )
                         PrimaryButton(
-                            text = if (uiState.isGeneratingPdf) "Membuat..." else "Generate PDF",
+                            text = if (uiState.isGeneratingPdf) "Mengunduh..." else "Download PDF",
                             icon = Icons.Default.Download,
                             onClick = {
                                 viewModel.preparePdfReportContent()

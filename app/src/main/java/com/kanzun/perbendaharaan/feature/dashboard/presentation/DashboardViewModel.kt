@@ -55,11 +55,8 @@ class DashboardViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = DashboardUiState.Loading
             try {
-                // Check if accounts exist; if not, seed initial development data
-                val breakdownBefore = repository.getCashBreakdown()
-                if (breakdownBefore.items.isEmpty()) {
-                    seeder.seedDevelopmentData()
-                }
+                // Initialize clean master data & purge any legacy dummy data
+                seeder.initCleanMasterData()
 
                 repository.getTransactions()
                     .catch { e ->

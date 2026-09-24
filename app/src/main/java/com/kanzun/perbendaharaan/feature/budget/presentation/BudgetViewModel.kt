@@ -105,17 +105,7 @@ class BudgetViewModel @Inject constructor(
         }
     }
 
-    init {
-        viewModelScope.launch {
-            try {
-                val existing = budgetRepository.getAllBudgets().first()
-                if (existing.isEmpty()) {
-                    seedSampleBudgets()
-                }
-            } catch (_: Exception) {
-            }
-        }
-    }
+
 
     val uiState: StateFlow<BudgetUiState> = combine(
         _searchQuery,
@@ -336,53 +326,6 @@ class BudgetViewModel @Inject constructor(
             } catch (e: Exception) {
                 _errorMessage.value = e.message
             }
-        }
-    }
-
-    private fun seedSampleBudgets() {
-        viewModelScope.launch {
-            val now = System.currentTimeMillis()
-            val cal = Calendar.getInstance()
-            val year = cal.get(Calendar.YEAR)
-
-            val b1Id = "budget_sep_2026"
-            val b1 = BudgetEntity(
-                id = b1Id,
-                year = 2026,
-                title = "RAPBM September 2026",
-                totalIncomeBudgetInCents = 15_000_000L,
-                totalExpenseBudgetInCents = 10_000_000L,
-                isLocked = false,
-            )
-
-            val items1 = listOf(
-                BudgetItemEntity(UUID.randomUUID().toString(), b1Id, "cat_infaq", 10_000_000L, false),
-                BudgetItemEntity(UUID.randomUUID().toString(), b1Id, "cat_donasi", 5_000_000L, false),
-                BudgetItemEntity(UUID.randomUUID().toString(), b1Id, "cat_listrik", 2_000_000L, true),
-                BudgetItemEntity(UUID.randomUUID().toString(), b1Id, "cat_air", 1_000_000L, true),
-                BudgetItemEntity(UUID.randomUUID().toString(), b1Id, "cat_operasional", 7_000_000L, true),
-            )
-
-            val b2Id = "budget_oct_2026"
-            val b2 = BudgetEntity(
-                id = b2Id,
-                year = 2026,
-                title = "RAPBM Oktober 2026",
-                totalIncomeBudgetInCents = 18_000_000L,
-                totalExpenseBudgetInCents = 12_000_000L,
-                isLocked = false,
-            )
-
-            val items2 = listOf(
-                BudgetItemEntity(UUID.randomUUID().toString(), b2Id, "cat_infaq", 12_000_000L, false),
-                BudgetItemEntity(UUID.randomUUID().toString(), b2Id, "cat_sedekah", 6_000_000L, false),
-                BudgetItemEntity(UUID.randomUUID().toString(), b2Id, "cat_listrik", 2_500_000L, true),
-                BudgetItemEntity(UUID.randomUUID().toString(), b2Id, "cat_kebersihan", 1_500_000L, true),
-                BudgetItemEntity(UUID.randomUUID().toString(), b2Id, "cat_kegiatan", 8_000_000L, true),
-            )
-
-            budgetRepository.createOrUpdateBudget(2026, b1.title, items1)
-            budgetRepository.createOrUpdateBudget(2026, b2.title, items2)
         }
     }
 

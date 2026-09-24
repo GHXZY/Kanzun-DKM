@@ -149,7 +149,7 @@ class NotificationViewModel @Inject constructor(
             when (type) {
                 "transaction" -> {
                     val trx = transactionDao.getTransactionById(id)
-                    if (trx != null || id.startsWith("trx_seed_")) {
+                    if (trx != null) {
                         onNavigate(Screen.CashFlow.route)
                     } else {
                         _missingEntityDialogMessage.value = "Data transaksi terkait tidak tersedia."
@@ -157,7 +157,7 @@ class NotificationViewModel @Inject constructor(
                 }
                 "target" -> {
                     val target = targetDao.getTargetById(id)
-                    if (target != null || id.startsWith("target_")) {
+                    if (target != null) {
                         onNavigate(Screen.Fundraising.route)
                     } else {
                         _missingEntityDialogMessage.value = "Data target dana terkait tidak tersedia."

@@ -53,68 +53,24 @@ class AssetsViewModel @Inject constructor(
                     )
                 }
                 .collect { assets ->
-                    // Seed initial assets if empty
-                    if (assets.isEmpty()) {
-                        seedSampleAssets()
-                    } else {
-                        val totalCents = assets
-                            .filter { it.conditionStatus != "Diarsipkan" && it.conditionStatus != "Disposed" }
-                            .sumOf { it.acquisitionValueInCents }
-                        val currentState = _uiState.value
-                        val filtered = applyFilters(
-                            assets = assets,
-                            query = currentState.searchQuery,
-                            condition = currentState.selectedConditionFilter,
-                            category = currentState.selectedCategoryFilter,
-                        )
-                        _uiState.value = currentState.copy(
-                            isLoading = false,
-                            totalAssetValue = Money.of(totalCents),
-                            allAssets = assets,
-                            filteredAssets = filtered,
-                        )
-                    }
+                    val totalCents = assets
+                        .filter { it.conditionStatus != "Diarsipkan" && it.conditionStatus != "Disposed" }
+                        .sumOf { it.acquisitionValueInCents }
+                    val currentState = _uiState.value
+                    val filtered = applyFilters(
+                        assets = assets,
+                        query = currentState.searchQuery,
+                        condition = currentState.selectedConditionFilter,
+                        category = currentState.selectedCategoryFilter,
+                    )
+                    _uiState.value = currentState.copy(
+                        isLoading = false,
+                        totalAssetValue = Money.of(totalCents),
+                        allAssets = assets,
+                        filteredAssets = filtered,
+                    )
                 }
         }
-    }
-
-    private suspend fun seedSampleAssets() {
-        val sample1 = AssetEntity(
-            id = "asset_01",
-            name = "Sound System Utama & Mixer",
-            categoryId = "Elektronik & Sound",
-            acquisitionDate = System.currentTimeMillis() - 180 * 86400000L,
-            acquisitionValueInCents = 35_000_000L,
-            fundSourceId = "Dana Pembangunan",
-            location = "Ruang Utama Sholat",
-            conditionStatus = "Baik",
-            serialNumber = "INV-2024-001",
-        )
-        val sample2 = AssetEntity(
-            id = "asset_02",
-            name = "AC Split 2 PK (3 Unit)",
-            categoryId = "Elektronik & Pendingin",
-            acquisitionDate = System.currentTimeMillis() - 365 * 86400000L,
-            acquisitionValueInCents = 18_000_000L,
-            fundSourceId = "Dana Operasional",
-            location = "Ruang Utama Sholat",
-            conditionStatus = "Dalam Perbaikan",
-            serialNumber = "INV-2023-045",
-        )
-        val sample3 = AssetEntity(
-            id = "asset_03",
-            name = "Karpet Sajadah Bulu Turki",
-            categoryId = "Perlengkapan Ibadah",
-            acquisitionDate = System.currentTimeMillis() - 90 * 86400000L,
-            acquisitionValueInCents = 45_000_000L,
-            fundSourceId = "Donasi Jamaah",
-            location = "Ruang Sholat Utama",
-            conditionStatus = "Baik",
-            serialNumber = "INV-2024-012",
-        )
-        assetDao.insertAsset(sample1)
-        assetDao.insertAsset(sample2)
-        assetDao.insertAsset(sample3)
     }
 
     fun setSearchQuery(query: String) {

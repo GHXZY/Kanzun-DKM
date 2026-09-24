@@ -27,19 +27,63 @@ import com.kanzun.perbendaharaan.core.designsystem.components.FloatingNavBar
 import com.kanzun.perbendaharaan.core.designsystem.components.IsolatedFeatureTopBar
 import com.kanzun.perbendaharaan.core.navigation.KanzunNavHost
 import com.kanzun.perbendaharaan.core.navigation.Screen
+import android.content.Context
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.kanzun.perbendaharaan.core.designsystem.components.SupportDonationDialog
 import com.kanzun.perbendaharaan.feature.notifications.presentation.NotificationViewModel
+import com.kanzun.perbendaharaan.feature.settings.presentation.SettingsViewModel
 import kotlinx.coroutines.launch
 
 @Composable
 fun AppShell(
     notificationViewModel: NotificationViewModel = hiltViewModel(),
+    settingsViewModel: SettingsViewModel = hiltViewModel(),
 ) {
+    val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
+
     var isDarkTheme by remember { mutableStateOf(false) }
+    var showSupportDialog by remember { mutableStateOf(false) }
+
+    fun checkAndTriggerSupportDialog() {
+        val prefs = context.getSharedPreferences("kanzun_support_prefs", Context.MODE_PRIVATE)
+        val lastShownTime = prefs.getLong("last_support_dialog_timestamp", 0L)
+        val currentTime = System.currentTimeMillis()
+        val twoHoursInMillis = 2 * 60 * 60 * 1000L // 2 jam
+
+        if (lastShownTime == 0L || (currentTime - lastShownTime >= twoHoursInMillis)) {
+            showSupportDialog = true
+            prefs.edit().putLong("last_support_dialog_timestamp", currentTime).apply()
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        checkAndTriggerSupportDialog()
+    }
+
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                checkAndTriggerSupportDialog()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route ?: "main_pager"
 
     val unreadCount by notificationViewModel.unreadCountState.collectAsState()
+    val settingsState by settingsViewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
@@ -60,6 +104,7 @@ fun AppShell(
         Screen.Fundraising.route,
         Screen.Budget.route,
         Screen.About.route,
+        Screen.PdfPreview.route,
     )
 
     val isMainScreen = currentRoute in mainRoutes || currentRoute == "main_pager"
@@ -78,8 +123,8 @@ fun AppShell(
             topBar = {
                 if (isMainScreen) {
                     AppTopBar(
-                        mosqueName = "Masjid Agung Al-Mubarak",
-                        mosqueAddress = "Jl. Ahmad Yani No. 45, Jakarta",
+                        mosqueName = settingsState.mosqueProfile?.name?.ifBlank { "Masjid Agung Al-Mubarak" } ?: "Masjid Agung Al-Mubarak",
+                        mosqueAddress = settingsState.mosqueProfile?.address?.ifBlank { "Jl. Ahmad Yani No. 45, Jakarta" } ?: "Jl. Ahmad Yani No. 45, Jakarta",
                         isDarkTheme = isDarkTheme,
                         onToggleTheme = { isDarkTheme = !isDarkTheme },
                         unreadCount = unreadCount,
@@ -95,6 +140,7 @@ fun AppShell(
                         Screen.Fundraising.route -> "Target Dana"
                         Screen.Budget.route -> "RAPBM"
                         Screen.About.route -> "Tentang Aplikasi"
+                        Screen.PdfPreview.route -> "Preview Surat Laporan"
                         else -> ""
                     }
                     IsolatedFeatureTopBar(
@@ -158,6 +204,12 @@ fun AppShell(
                     )
                 }
             }
+        }
+
+        if (showSupportDialog) {
+            SupportDonationDialog(
+                onDismiss = { showSupportDialog = false },
+            )
         }
     }
 }

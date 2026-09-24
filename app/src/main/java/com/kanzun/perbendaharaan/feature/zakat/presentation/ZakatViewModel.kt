@@ -59,77 +59,24 @@ class ZakatViewModel @Inject constructor(
             mustahikDao.getAllMustahiks()
                 .catch { e -> _uiState.value = _uiState.value.copy(errorMessage = e.message) }
                 .collect { mustahikList ->
-                    if (mustahikList.isEmpty()) {
-                        seedSampleMustahiks()
-                    } else {
-                        zakatDao.getAllZakatTransactions()
-                            .catch { e -> _uiState.value = _uiState.value.copy(errorMessage = e.message) }
-                            .collect { txList ->
-                                if (txList.isEmpty()) {
-                                    seedSampleZakatTransactions()
-                                } else {
-                                    val receivedCents = txList.filter { !it.isDistribution }.sumOf { it.amountInCents }
-                                    val distributedCents = txList.filter { it.isDistribution }.sumOf { it.amountInCents }
-                                    val balanceCents = receivedCents - distributedCents
+                    zakatDao.getAllZakatTransactions()
+                        .catch { e -> _uiState.value = _uiState.value.copy(errorMessage = e.message) }
+                        .collect { txList ->
+                            val receivedCents = txList.filter { !it.isDistribution }.sumOf { it.amountInCents }
+                            val distributedCents = txList.filter { it.isDistribution }.sumOf { it.amountInCents }
+                            val balanceCents = receivedCents - distributedCents
 
-                                    _uiState.value = _uiState.value.copy(
-                                        isLoading = false,
-                                        totalReceived = Money.of(receivedCents),
-                                        totalDistributed = Money.of(distributedCents),
-                                        currentZakatBalance = Money.of(balanceCents),
-                                        zakatTransactions = txList,
-                                        mustahiks = mustahikList,
-                                    )
-                                }
-                            }
-                    }
+                            _uiState.value = _uiState.value.copy(
+                                isLoading = false,
+                                totalReceived = Money.of(receivedCents),
+                                totalDistributed = Money.of(distributedCents),
+                                currentZakatBalance = Money.of(balanceCents),
+                                zakatTransactions = txList,
+                                mustahiks = mustahikList,
+                            )
+                        }
                 }
         }
-    }
-
-    private suspend fun seedSampleMustahiks() {
-        val m1 = MustahikEntity("m_01", "Bpk. Abdullah", "Fakir", "RT 02 RW 04", "08123456789")
-        val m2 = MustahikEntity("m_02", "Ibu Aminah", "Miskin", "RT 05 RW 02", "08987654321")
-        val m3 = MustahikEntity("m_03", "Anak Yatim Piatu Al-Falah", "Fakir", "RT 01 RW 01", "")
-        mustahikDao.insertMustahik(m1)
-        mustahikDao.insertMustahik(m2)
-        mustahikDao.insertMustahik(m3)
-    }
-
-    private suspend fun seedSampleZakatTransactions() {
-        val t1 = ZakatTransactionEntity(
-            id = "z_01",
-            zakatType = "Zakat Fitrah",
-            isDistribution = false,
-            amountInCents = 35_000_000L,
-            muzakiOrMustahikName = "Jamaah Ramadan",
-            timestamp = System.currentTimeMillis() - 15 * 86400000L,
-            accountId = "acc_bsi",
-            note = "Penerimaan Zakat Fitrah 1447H",
-        )
-        val t2 = ZakatTransactionEntity(
-            id = "z_02",
-            zakatType = "Zakat Maal",
-            isDistribution = false,
-            amountInCents = 15_000_000L,
-            muzakiOrMustahikName = "Hamba Allah",
-            timestamp = System.currentTimeMillis() - 10 * 86400000L,
-            accountId = "acc_bsi",
-            note = "Transfer BSI Zakat Maal",
-        )
-        val t3 = ZakatTransactionEntity(
-            id = "z_03",
-            zakatType = "Penyaluran Fitrah",
-            isDistribution = true,
-            amountInCents = 42_000_000L,
-            muzakiOrMustahikName = "Bpk. Abdullah",
-            timestamp = System.currentTimeMillis() - 5 * 86400000L,
-            accountId = "acc_cash",
-            note = "Paket sembako & santunan tunai",
-        )
-        zakatDao.insertZakatTransaction(t1)
-        zakatDao.insertZakatTransaction(t2)
-        zakatDao.insertZakatTransaction(t3)
     }
 
     fun setSelectedTab(index: Int) {

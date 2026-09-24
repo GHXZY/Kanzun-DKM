@@ -32,8 +32,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -54,7 +52,6 @@ import com.kanzun.perbendaharaan.core.designsystem.KanzunShapes
 import com.kanzun.perbendaharaan.core.designsystem.Spacing
 import com.kanzun.perbendaharaan.core.designsystem.components.PrimaryButton
 import com.kanzun.perbendaharaan.core.designsystem.components.ResponsiveContentContainer
-import com.kanzun.perbendaharaan.core.designsystem.components.SecondaryButton
 import com.kanzun.perbendaharaan.feature.reports.domain.model.ReportContent
 import java.io.File
 import java.text.SimpleDateFormat
@@ -81,35 +78,6 @@ fun PdfPreviewScreen(
     }
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Column {
-                        Text(
-                            text = "Preview Surat Laporan (A4)",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                        )
-                        Text(
-                            text = uiState.reportContent?.mosqueName ?: "Masjid Perbendaharaan",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Kembali",
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                ),
-            )
-        },
         bottomBar = {
             Surface(
                 modifier = Modifier.fillMaxWidth(),
@@ -117,23 +85,16 @@ fun PdfPreviewScreen(
                 shadowElevation = 8.dp,
                 color = MaterialTheme.colorScheme.surface,
             ) {
-                Row(
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(Spacing.MD),
-                    horizontalArrangement = Arrangement.spacedBy(Spacing.SM),
                 ) {
-                    SecondaryButton(
-                        text = "Ubah Filter",
-                        onClick = onBackClick,
-                        modifier = Modifier.weight(1f),
-                    )
-
                     PrimaryButton(
-                        text = if (uiState.isGeneratingPdf) "Membuat PDF..." else "Generate & Download PDF",
+                        text = if (uiState.isGeneratingPdf) "Mengunduh PDF..." else "Download PDF",
                         icon = Icons.Default.Download,
                         onClick = { viewModel.exportPdf(context) },
-                        modifier = Modifier.weight(1f),
+                        fullWidth = true,
                     )
                 }
             }

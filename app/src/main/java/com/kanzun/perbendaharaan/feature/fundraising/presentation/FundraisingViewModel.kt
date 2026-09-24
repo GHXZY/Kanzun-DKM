@@ -82,15 +82,11 @@ class FundraisingViewModel @Inject constructor(
             targetDao.getAllTargets()
                 .catch { e -> _uiState.value = _uiState.value.copy(errorMessage = e.message) }
                 .collect { targetList ->
-                    if (targetList.isEmpty()) {
-                        seedSampleTargets()
-                    } else {
-                        donationDao.getAllDonations()
-                            .catch { e -> _uiState.value = _uiState.value.copy(errorMessage = e.message) }
-                            .collect { donationList ->
-                                computeAndEmitState(targetList, donationList)
-                            }
-                    }
+                    donationDao.getAllDonations()
+                        .catch { e -> _uiState.value = _uiState.value.copy(errorMessage = e.message) }
+                        .collect { donationList ->
+                            computeAndEmitState(targetList, donationList)
+                        }
                 }
         }
     }
@@ -192,100 +188,6 @@ class FundraisingViewModel @Inject constructor(
             donations = donationList,
             selectedTargetForDetail = updatedDetail,
         )
-    }
-
-    private suspend fun seedSampleTargets() {
-        val now = System.currentTimeMillis()
-
-        val t1 = FundraisingTargetEntity(
-            id = "target_renov_masjid",
-            title = "Renovasi Masjid",
-            targetAmountInCents = 100_000_000L,
-            collectedAmountInCents = 65_000_000L,
-            startDate = now - 30 * 86400000L,
-            endDate = now + 60 * 86400000L,
-            status = "Aktif",
-        )
-        val t2 = FundraisingTargetEntity(
-            id = "target_toilet",
-            title = "Pembangunan Toilet",
-            targetAmountInCents = 50_000_000L,
-            collectedAmountInCents = 20_000_000L,
-            startDate = now - 15 * 86400000L,
-            endDate = now + 45 * 86400000L,
-            status = "Aktif",
-        )
-        val t3 = FundraisingTargetEntity(
-            id = "target_yatim",
-            title = "Santunan Anak Yatim Ramadan",
-            targetAmountInCents = 30_000_000L,
-            collectedAmountInCents = 30_000_000L,
-            startDate = now - 60 * 86400000L,
-            endDate = now - 10 * 86400000L,
-            status = "Selesai",
-        )
-
-        targetDao.insertTarget(t1)
-        targetDao.insertTarget(t2)
-        targetDao.insertTarget(t3)
-
-        // Seed Donations & Kas Allocations & Distributions
-        val d1 = DonationEntity(
-            id = "don_renov_1",
-            targetId = "target_renov_masjid",
-            donorName = "Donasi: Bpk. H. Ahmad",
-            amountInCents = 25_000_000L,
-            timestamp = now - 22 * 86400000L,
-            accountId = "acc_bsi",
-        )
-        val d2 = DonationEntity(
-            id = "don_renov_2",
-            targetId = "target_renov_masjid",
-            donorName = "Donasi: Ibu Hj. Maryam",
-            amountInCents = 15_000_000L,
-            timestamp = now - 20 * 86400000L,
-            accountId = "acc_bsi",
-        )
-        val d3 = DonationEntity(
-            id = "don_renov_3",
-            targetId = "target_renov_masjid",
-            donorName = "Alokasi Kas Masjid",
-            amountInCents = 25_000_000L,
-            timestamp = now - 18 * 86400000L,
-            accountId = "acc_cash",
-        )
-        val d4 = DonationEntity(
-            id = "don_renov_4",
-            targetId = "target_renov_masjid",
-            donorName = "Penyaluran: Pembelian Material Semen & Cat",
-            amountInCents = 20_000_000L,
-            timestamp = now - 10 * 86400000L,
-            accountId = "acc_cash",
-        )
-
-        val d5 = DonationEntity(
-            id = "don_toilet_1",
-            targetId = "target_toilet",
-            donorName = "Donasi: Hamba Allah",
-            amountInCents = 15_000_000L,
-            timestamp = now - 12 * 86400000L,
-            accountId = "acc_bsi",
-        )
-        val d6 = DonationEntity(
-            id = "don_toilet_2",
-            targetId = "target_toilet",
-            donorName = "Alokasi Kas Masjid",
-            amountInCents = 5_000_000L,
-            timestamp = now - 8 * 86400000L,
-            accountId = "acc_cash",
-        )
-
-        donationDao.insertDonation(d1)
-        donationDao.insertDonation(d2)
-        donationDao.insertDonation(d3)
-        donationDao.insertDonation(d4)
-        donationDao.insertDonation(d5)
-        donationDao.insertDonation(d6)
     }
 
     // Modal Control Methods

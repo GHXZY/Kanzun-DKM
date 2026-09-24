@@ -72,11 +72,8 @@ class CashFlowViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
             try {
-                // Ensure initial seed data exists
-                val breakdown = repository.getCashBreakdown()
-                if (breakdown.items.isEmpty()) {
-                    seeder.seedDevelopmentData()
-                }
+                // Ensure clean master data & purge any legacy dummy data
+                seeder.initCleanMasterData()
 
                 val accounts = repository.getActiveAccounts().first()
                 val funds = repository.getActiveFunds().first()

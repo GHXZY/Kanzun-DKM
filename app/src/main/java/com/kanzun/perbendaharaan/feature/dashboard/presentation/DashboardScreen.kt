@@ -111,13 +111,6 @@ fun DashboardScreen(
                     HeroCard(
                         title = "Total Kas",
                         amountText = state.totalCash.formatRupiah(),
-                        actionButton = {
-                            PrimaryButton(
-                                text = "Tambah Transaksi",
-                                onClick = { onNavigateToFeature("cash_flow") },
-                                fullWidth = true,
-                            )
-                        },
                     )
 
                     // 3. REKENING VS CASH (Pie / Donut Chart)

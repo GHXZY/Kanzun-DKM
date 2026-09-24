@@ -155,7 +155,7 @@ class SettingsRepositoryImpl @Inject constructor(
 
     override suspend fun resetData(context: Context) {
         database.clearAllTables()
-        devDataSeeder.seedDevelopmentData()
+        devDataSeeder.initCleanMasterData()
         auditLogDao.insertAuditLog(
             AuditLogEntity(
                 id = UUID.randomUUID().toString(),
@@ -164,7 +164,7 @@ class SettingsRepositoryImpl @Inject constructor(
                 action = "RESET_ALL_DATA",
                 entityName = "Database",
                 entityId = "kanzun_perbendaharaan.db",
-                afterStateJson = "Database reset to initial seed state",
+                afterStateJson = "Database reset to clean state (all dummy data removed)",
             )
         )
     }

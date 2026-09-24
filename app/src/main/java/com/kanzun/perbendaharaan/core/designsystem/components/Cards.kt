@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -25,19 +26,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
+
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import coil.ImageLoader
-import coil.compose.AsyncImage
-import coil.decode.SvgDecoder
-import coil.request.ImageRequest
+
 import com.kanzun.perbendaharaan.core.designsystem.Elevation
 import com.kanzun.perbendaharaan.core.designsystem.IconSize
 import com.kanzun.perbendaharaan.core.designsystem.KanzunShapes
 import com.kanzun.perbendaharaan.core.designsystem.Spacing
-import java.io.File
 
 @Composable
 fun AppCard(
@@ -83,106 +79,54 @@ fun HeroCard(
     amountText: String,
     modifier: Modifier = Modifier,
     subtitle: String? = null,
-    badgeText: String? = null,
-    illustrationPath: String? = "C:/Dev/Kanzun/Masjid.svg",
-    actionButton: @Composable (() -> Unit)? = null,
 ) {
-    val context = LocalContext.current
-    val imageLoader = remember(context) {
-        ImageLoader.Builder(context)
-            .components {
-                add(SvgDecoder.Factory())
-            }
-            .build()
-    }
-
-    val imageModel: Any = remember(illustrationPath) {
-        if (illustrationPath != null && File(illustrationPath).exists()) {
-            File(illustrationPath)
-        } else {
-            "file:///android_asset/masjid.svg"
-        }
-    }
-
     Card(
         modifier = modifier
             .fillMaxWidth()
+            .heightIn(min = 160.dp)
             .neomorphic(KanzunShapes.HeroCard),
         shape = KanzunShapes.HeroCard,
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = Color.White,
         ),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
     ) {
         Box(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = 160.dp)
+                .padding(horizontal = Spacing.LG, vertical = Spacing.LG),
+            contentAlignment = Alignment.CenterStart,
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(Spacing.LG),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
+            Column(
+                horizontalAlignment = Alignment.Start,
+                verticalArrangement = Arrangement.Center,
             ) {
-                Column(
-                    modifier = Modifier.weight(1f),
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(Spacing.XS),
-                    ) {
-                        Text(
-                            text = title,
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.85f),
-                            fontWeight = FontWeight.Medium,
-                        )
-                        if (badgeText != null) {
-                            StatusChip(
-                                text = badgeText,
-                                type = ChipStatusType.SUCCESS,
-                            )
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(Spacing.XS))
-
-                    Text(
-                        text = amountText,
-                        style = MaterialTheme.typography.headlineMedium,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer,
-                        fontWeight = FontWeight.Bold,
-                    )
-
-                    if (subtitle != null) {
-                        Spacer(modifier = Modifier.height(Spacing.XS))
-                        Text(
-                            text = subtitle,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.75f),
-                        )
-                    }
-
-                    if (actionButton != null) {
-                        Spacer(modifier = Modifier.height(Spacing.MD))
-                        actionButton()
-                    }
-                }
-
-                Spacer(modifier = Modifier.width(Spacing.SM))
-
-                AsyncImage(
-                    model = ImageRequest.Builder(context)
-                        .data(imageModel)
-                        .crossfade(true)
-                        .build(),
-                    imageLoader = imageLoader,
-                    contentDescription = "Mosque Illustration",
-                    contentScale = ContentScale.Fit,
-                    modifier = Modifier.size(width = 125.dp, height = 110.dp)
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleSmall,
+                    color = Color.White.copy(alpha = 0.80f),
+                    fontWeight = FontWeight.Medium,
                 )
+
+                Spacer(modifier = Modifier.height(Spacing.SM))
+
+                Text(
+                    text = amountText,
+                    style = MaterialTheme.typography.displaySmall,
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                )
+
+                if (subtitle != null) {
+                    Spacer(modifier = Modifier.height(Spacing.XS))
+                    Text(
+                        text = subtitle,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.White.copy(alpha = 0.70f),
+                    )
+                }
             }
         }
     }

@@ -272,6 +272,23 @@ fun SettingsScreen(
                 }
             }
 
+            // SIMPAN IDENTITAS MASJID BUTTON
+            PrimaryButton(
+                text = "Simpan Identitas Masjid",
+                onClick = {
+                    val currentLogo = uiState.mosqueProfile?.logoPath ?: ""
+                    viewModel.saveMosqueIdentity(
+                        name = mosqueName,
+                        address = mosqueAddress,
+                        treasurerName = treasurerName,
+                        dkmChairmanName = dkmChairmanName,
+                        logoPath = currentLogo,
+                    )
+                },
+                icon = Icons.Default.Save,
+                fullWidth = true,
+            )
+
             // CARD 3: KEAMANAN & PIN
             AppCard(modifier = Modifier.fillMaxWidth()) {
                 Column(verticalArrangement = Arrangement.spacedBy(Spacing.SM)) {
@@ -494,25 +511,6 @@ fun SettingsScreen(
                     )
                 }
             }
-
-            Spacer(modifier = Modifier.height(Spacing.XS))
-
-            // SAVE BUTTON
-            PrimaryButton(
-                text = "Simpan Identitas Masjid",
-                onClick = {
-                    val currentLogo = uiState.mosqueProfile?.logoPath ?: ""
-                    viewModel.saveMosqueIdentity(
-                        name = mosqueName,
-                        address = mosqueAddress,
-                        treasurerName = treasurerName,
-                        dkmChairmanName = dkmChairmanName,
-                        logoPath = currentLogo,
-                    )
-                },
-                icon = Icons.Default.Save,
-                fullWidth = true,
-            )
         }
     }
 
